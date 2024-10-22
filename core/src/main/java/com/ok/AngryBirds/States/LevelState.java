@@ -1,19 +1,37 @@
 package com.ok.AngryBirds.States;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.ok.AngryBirds.Main;
 
 public class LevelState extends State {
-    private Texture level_map;
+    private final Texture levels;
 
     protected LevelState(GameStateManager gsm) {
         super(gsm);
-        level_map=new Texture("level_map.png");
+        levels=new Texture("levels_ab.png");
     }
 
     @Override
     protected void hande_input() {
+        if (Gdx.input.justTouched()) {
+            int touchX = Gdx.input.getX();
+            int touchY = Gdx.input.getY();
 
+            touchY = Main.height - touchY;
+
+            float buttonX = 20;
+            float buttonY = 680;
+            float buttonWidthX = 120;
+            float buttonHeightY = 780;
+
+            if (touchX >= buttonX && touchX <= buttonWidthX &&
+                touchY >= buttonY && touchY <=buttonHeightY) {
+                gsm.set(new MenuState(gsm));
+                dispose();
+            }
+        }
     }
 
     @Override
@@ -23,11 +41,13 @@ public class LevelState extends State {
 
     @Override
     public void render(SpriteBatch sb) {
-
+        sb.begin();
+        sb.draw(levels,0,0);
+        sb.end();
     }
 
     @Override
     public void dispose() {
-
+        levels.dispose();
     }
 }

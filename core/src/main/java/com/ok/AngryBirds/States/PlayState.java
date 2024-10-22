@@ -31,6 +31,6 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
-
+        bird.dispose();
     }
 }
