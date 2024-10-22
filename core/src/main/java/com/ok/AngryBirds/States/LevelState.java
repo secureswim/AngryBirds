@@ -36,6 +36,23 @@ public class LevelState extends State {
                 dispose();
             }
         }
+        if (Gdx.input.justTouched()) {
+            float touchX = Gdx.input.getX();
+            float touchY = Gdx.input.getY();
+
+            touchY = Main.height - touchY;
+
+            float buttonX = 35;
+            float buttonY = 240;
+            float buttonWidthX = 90;
+            float buttonHeightY = 90;
+
+            if (touchX >= buttonX && touchX <= buttonX+buttonWidthX &&
+                touchY >= buttonY && touchY <=buttonY+buttonHeightY) {
+                gsm.set(new Level1(gsm));
+                dispose();
+            }
+        }
     }
 
     @Override
@@ -47,7 +64,7 @@ public class LevelState extends State {
     public void render(SpriteBatch sb) {
         sb.begin();
         sb.draw(levels,0,0);
-        sb.draw(square,35,240,90,90);
+        //sb.draw(square,35,240,90,90);
         sb.end();
     }
 
