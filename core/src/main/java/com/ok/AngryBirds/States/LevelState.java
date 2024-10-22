@@ -21,10 +21,10 @@ public class LevelState extends State {
 
             touchY = Main.height - touchY;
 
-            float buttonX = 20;
-            float buttonY = 680;
-            float buttonWidthX = 120;
-            float buttonHeightY = 780;
+            float buttonX = 40;
+            float buttonY = 40;
+            float buttonWidthX = 240;
+            float buttonHeightY = 240;
 
             if (touchX >= buttonX && touchX <= buttonWidthX &&
                 touchY >= buttonY && touchY <=buttonHeightY) {
