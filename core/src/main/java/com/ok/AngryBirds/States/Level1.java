@@ -27,7 +27,7 @@ public class Level1 extends State{
     public void render(SpriteBatch sb) {
         sb.begin();
         sb.draw(level1,0,0);
-        sb.draw(slingshot,10,190);
+        sb.draw(slingshot,50,190,220,220);
         sb.end();
     }
 
