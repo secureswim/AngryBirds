@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.ok.AngryBirds.Main;
 
 public class MenuState extends State{
-    private final Texture background;
-    private final Texture playbutton;
+    private Texture background;
+    private Texture playbutton;
     public MenuState(GameStateManager gsm) {
         super(gsm);
         background=new Texture("ab_bg.png");
