@@ -18,6 +18,9 @@ public class Level_1 extends State{
     private final Texture triangle1;
     private final Texture triangle2;
     private final Texture pause;
+    private final Texture win;
+    private final Texture lose;
+
 
     public Level_1(GameStateManager gsm) {
         super(gsm);
@@ -33,6 +36,9 @@ public class Level_1 extends State{
         triangle1=new Texture("ice_tri_left.png");
         triangle2=new Texture("ice_tri_right.png");
         pause=new Texture("pause_button.png");
+        win=new Texture("win_button.png");
+        lose=new Texture("lose_button.png");
+
     }
 
     @Override
@@ -46,6 +52,27 @@ public class Level_1 extends State{
                     dispose();
                 }
             }
+
+            if (Gdx.input.justTouched()) {
+                float x = Gdx.input.getX();
+                float y = Gdx.graphics.getHeight()-Gdx.input.getY();
+
+                if (x >= 1110 && x <= 1180 && y >= 665 && y <= 735) {
+                    gsm.set(new WinState(gsm));
+                    dispose();
+                }
+            }
+
+            if (Gdx.input.justTouched()) {
+                float x = Gdx.input.getX();
+                float y = Gdx.graphics.getHeight()-Gdx.input.getY();
+
+                if (x >= 1110 && x <= 1180 && y >= 595 && y <= 665) {
+                    gsm.set(new LoseState(gsm));
+                    dispose();
+                }
+            }
+
         }
 
 
@@ -71,6 +98,8 @@ public class Level_1 extends State{
         sb.draw(triangle1,860,255,42,42);
         sb.draw(triangle2,962,255,42,42);
         sb.draw(pause,30,650,85,85);
+        sb.draw(win,1110,665,70,70);
+        sb.draw(lose,1110,595,70,70);
 
 
         //sb.draw(ice1,990,285,20,150);
