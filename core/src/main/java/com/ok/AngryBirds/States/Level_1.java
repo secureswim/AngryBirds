@@ -15,7 +15,8 @@ public class Level_1 extends State{
     private final Texture pig1;
     private final Texture ice1;
     private final Texture block;
-    private final Texture triangle;
+    private final Texture triangle1;
+    private final Texture triangle2;
     private final Texture pause;
 
     public Level_1(GameStateManager gsm) {
@@ -29,7 +30,8 @@ public class Level_1 extends State{
         pig1=new Texture("pig1.png");
         ice1=new Texture("v_ice_short.png");
         block=new Texture("ice_block.png");
-        triangle=new Texture("triangle_wood.png");
+        triangle1=new Texture("ice_tri_left.png");
+        triangle2=new Texture("ice_tri_right.png");
         pause=new Texture("pause_button.png");
     }
 
@@ -48,17 +50,17 @@ public class Level_1 extends State{
         sb.begin();
         sb.draw(level1,0,0,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sb.draw(slingshot,50,97,190,190);
-        sb.draw(bird,125,240,50,50);
+        sb.draw(bird,125,238,50,50);
         sb.draw(wood1,860,98,16,150);
         sb.draw(wood2,992,98,16,150);
         sb.draw(wood3,855,240,155,16);
-        sb.draw(pig1,905,320,60,60);
+        sb.draw(pig1,903,310,57,57);
         sb.draw(ice1,900,100,16,100);
         sb.draw(ice1,952,100,16,100);
         sb.draw(wood3,898,195,69,16);
-        sb.draw(block,905,265,70,70);
-        sb.draw(triangle,803,100,60,60);
-        sb.draw(triangle,1000,100,60,60);
+        sb.draw(block,902,255,60,60);
+        sb.draw(triangle1,860,255,42,42);
+        sb.draw(triangle2,962,255,42,42);
         sb.draw(pause,30,650,90,90);
 
 
