@@ -37,12 +37,21 @@ public class Level_1 extends State{
 
     @Override
     protected void hande_input() {
+            if (Gdx.input.justTouched()) {
+                float x = Gdx.input.getX();
+                float y = Gdx.graphics.getHeight()-Gdx.input.getY();
 
-    }
+                if (x >= 30 && x <= 115 && y >= 650 && y <= 735) {
+                    gsm.push(new PauseMenu(gsm));
+                    dispose();
+                }
+            }
+        }
+
 
     @Override
     public void update(float dt) {
-
+        hande_input();
     }
 
     @Override
@@ -61,7 +70,7 @@ public class Level_1 extends State{
         sb.draw(block,902,255,60,60);
         sb.draw(triangle1,860,255,42,42);
         sb.draw(triangle2,962,255,42,42);
-        sb.draw(pause,30,650,90,90);
+        sb.draw(pause,30,650,85,85);
 
 
         //sb.draw(ice1,990,285,20,150);

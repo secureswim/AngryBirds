@@ -10,7 +10,7 @@ public class MenuState extends State{
     private Texture playbutton;
     public MenuState(GameStateManager gsm) {
         super(gsm);
-        background=new Texture("ab_bg.png");
+        background=new Texture("new_bg.png");
         playbutton=new Texture("play_ab.png");
     }
 
@@ -50,7 +50,7 @@ public class MenuState extends State{
     public void render(SpriteBatch sb) {
         sb.begin();
         sb.draw(background,0,0, Main.width,Main.height);
-        sb.draw(playbutton,((float) Main.width /2)-((float) playbutton.getWidth() /2), (float) (Main.height /2)-100);
+        //sb.draw(playbutton,((float) Main.width /2)-((float) playbutton.getWidth() /2), (float) (Main.height /2)-100);
         sb.end();
     }
 }
