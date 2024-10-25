@@ -29,7 +29,7 @@ public class Level_2 extends State {
                 return;
             }
             if (x >= 1110 && x <= 1180 && y >= 665 && y <= 735) {
-                gsm.push(new WinState(gsm));
+                gsm.push(new WinState(gsm,this));
                 dispose();
             } else if (x >= 1110 && x <= 1180 && y >= 595 && y <= 665) {
                 gsm.push(new LoseState(gsm));

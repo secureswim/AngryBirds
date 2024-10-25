@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class WinState extends State{
     private final Texture win_screen;
 
-    public WinState(GameStateManager gsm){
+    public WinState(GameStateManager gsm, State currentState){
         super(gsm);
         win_screen=new Texture("win_screen.png");
     }

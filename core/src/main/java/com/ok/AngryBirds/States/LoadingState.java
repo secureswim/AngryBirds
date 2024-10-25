@@ -16,7 +16,6 @@ public class LoadingState extends State{
     public LoadingState(GameStateManager gsm) {
         super(gsm);
         loading_bg=new Texture("loading_background.png");
-
         loading_bar=new Texture("loading_bar.png");
         loading_bar_background=new Texture("loading_bar_background.png");
         loadingTime=3.5f;
@@ -33,7 +32,8 @@ public class LoadingState extends State{
         elapsedTime+=dt;
 
         if (elapsedTime >=loadingTime) {
-            gsm.set(new MenuState(gsm));
+            gsm.pop();
+            gsm.push(new MenuState(gsm));
         }
     }
 
