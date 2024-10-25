@@ -5,16 +5,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.ok.AngryBirds.Main;
 
-import java.awt.*;
-
 public class LevelState extends State {
     private final Texture levels;
-    private final Texture square;
+    private final Texture play;
+    private final Texture back;
+
 
     protected LevelState(GameStateManager gsm) {
         super(gsm);
         levels=new Texture("levels_ab.png");
-        square=new Texture("square.png");
+        play=new Texture("main_play_button.png");
+        back=new Texture("back_button.png");
+
     }
 
     @Override
@@ -25,13 +27,13 @@ public class LevelState extends State {
 
             touchY = Main.height - touchY;
 
-            float buttonX = 40;
-            float buttonY = 40;
-            float buttonWidthX = 100;
-            float buttonHeightY = 100;
+            float backX = 50;
+            float backY = 30;
+            float backWidthX = 90;
+            float backHeightY = 90;
 
-            if (touchX >= buttonX && touchX <= buttonX+buttonWidthX &&
-                touchY >= buttonY && touchY <=buttonY+buttonHeightY) {
+            if (touchX >= backX && touchX <= backX+ backWidthX &&
+                touchY >= backY && touchY <=backY+ backHeightY) {
                 gsm.push(new MenuState(gsm));
                 dispose();
             }
@@ -42,13 +44,13 @@ public class LevelState extends State {
 
             touchY = Main.height - touchY;
 
-            float buttonX = 35;
-            float buttonY = 240;
-            float buttonWidthX = 90;
-            float buttonHeightY = 90;
+            float playX = 505;
+            float playY = 30;
+            float playWidthX = 200;
+            float playWidthY = 100;
 
-            if (touchX >= buttonX && touchX <= buttonX+buttonWidthX &&
-                touchY >= buttonY && touchY <=buttonY+buttonHeightY) {
+            if (touchX >= playX && touchX <= playX + playWidthX &&
+                touchY >= playY && touchY <= playY + playWidthY) {
                 gsm.push(new Level_1(gsm));
                 dispose();
             }
@@ -63,14 +65,16 @@ public class LevelState extends State {
     @Override
     public void render(SpriteBatch sb) {
         sb.begin();
-        sb.draw(levels,0,0);
-        //sb.draw(square,35,240,90,90);
+        sb.draw(levels,0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        sb.draw(play,505,30,200,100);
+        sb.draw(back,50,30,90,90);
         sb.end();
     }
 
     @Override
     public void dispose() {
         levels.dispose();
-        square.dispose();
+        play.dispose();
+        back.dispose();
     }
 }
