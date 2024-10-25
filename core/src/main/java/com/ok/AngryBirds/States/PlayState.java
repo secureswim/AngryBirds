@@ -14,8 +14,6 @@ public class PlayState extends State {
 
     @Override
     protected void hande_input() {
-
-
     }
 
     @Override
@@ -32,6 +30,5 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
-        bird.dispose();
     }
 }
