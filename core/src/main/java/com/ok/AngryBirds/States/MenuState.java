@@ -22,10 +22,10 @@ public class MenuState extends State{
 
             touchY = Main.height - touchY;
 
-            float buttonX = 505;
-            float buttonY = 20;
-            float buttonWidth = 200;
-            float buttonHeight = 100;
+            float buttonX = 494;
+            float buttonY = 24;
+            float buttonWidth = 180;
+            float buttonHeight = 90;
 
             if (touchX >= buttonX && touchX <= buttonX + buttonWidth &&
                 touchY >= buttonY && touchY <= buttonY + buttonHeight) {
@@ -50,7 +50,7 @@ public class MenuState extends State{
     public void render(SpriteBatch sb) {
         sb.begin();
         sb.draw(background,0,0, Main.width,Main.height);
-        sb.draw(playbutton,505,20,200,100);
+        sb.draw(playbutton,495,24,180,90);
         sb.end();
     }
 }

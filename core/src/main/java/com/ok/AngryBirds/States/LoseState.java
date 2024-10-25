@@ -14,6 +14,7 @@ public class LoseState extends State{
     private final Texture lose_bar;
     private final Texture replay;
     private final Texture levels;
+    private final Texture quit;
 
     protected LoseState(GameStateManager gsm, State currentState) {
         super(gsm);
@@ -22,6 +23,7 @@ public class LoseState extends State{
         lose_bar = new Texture("lose_screen.png");
         replay = new Texture("replay_button.png");
         levels = new Texture("levels_button.png");
+        quit=new Texture("quit_button.png");
 
     }
 
@@ -31,12 +33,16 @@ public class LoseState extends State{
             float x = Gdx.input.getX();
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
 
-            if (x >= 500 && x <= 564 && y >= 200 && y <= 264) {
+            if (x >= 470 && x <= 534 && y >= 200 && y <= 264) {
                 gsm.pop();
                 gsm.pop();
                 gsm.push(new Level_1(gsm));
             }
-            if (x >= 600 && x <= 664 && y >= 200 && y <= 264) {
+            if (x >= 570 && x <= 634 && y >= 200 && y <= 264) {
+                gsm.pop();
+                gsm.push(new MenuState(gsm));
+            }
+            if (x >= 670 && x <= 734 && y >= 200 && y <= 264) {
                 gsm.pop();
                 gsm.push(new LevelState(gsm));
             }
@@ -62,8 +68,9 @@ public class LoseState extends State{
 
         sb.begin();
         sb.draw(lose_bar, 350, 150,500,500);
-        sb.draw(replay, 500, 200, 64, 64);
-        sb.draw(levels, 600, 200, 64, 64);
+        sb.draw(replay, 470, 200, 64, 64);
+        sb.draw(quit, 570, 200, 64, 64);
+        sb.draw(levels, 670, 200, 64, 64);
         sb.end();
     }
 

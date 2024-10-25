@@ -13,6 +13,7 @@ public class Level_1 extends State {
     private final Texture level1;
     private final Texture slingshot;
     private final Texture bird;
+    private final Texture bird2;
     private final Texture wood1;
     private final Texture wood2;
     private final Texture wood3;
@@ -30,6 +31,7 @@ public class Level_1 extends State {
         level1 = new Texture("level1_background.jpg");
         slingshot = new Texture("slingshot_ab.png");
         bird = new Texture("red_ab.png");
+        bird2=new Texture("yellow_ab.png");
         wood1 = new Texture("vertical_wood.png");
         wood2 = new Texture("vertical_wood.png");
         wood3 = new Texture("horizontal_wood.png");
@@ -75,6 +77,7 @@ public class Level_1 extends State {
         sb.draw(level1, 0, 0);
         sb.draw(slingshot, 50, 190, 190, 190);
         sb.draw(bird, 125, 331, 50, 50);
+        sb.draw(bird2,55,193,50,50);
         sb.draw(wood1, 860, 191, 16, 150);
         sb.draw(wood2, 992, 191, 16, 150);
         sb.draw(wood3, 855, 333, 155, 16);
@@ -100,6 +103,7 @@ public class Level_1 extends State {
         level1.dispose();
         slingshot.dispose();
         bird.dispose();
+        bird2.dispose();
         wood1.dispose();
         wood2.dispose();
         wood3.dispose();
