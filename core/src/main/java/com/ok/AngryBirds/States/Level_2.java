@@ -32,7 +32,7 @@ public class Level_2 extends State {
                 gsm.push(new WinState(gsm,this));
                 dispose();
             } else if (x >= 1110 && x <= 1180 && y >= 595 && y <= 665) {
-                gsm.push(new LoseState(gsm));
+                gsm.push(new LoseState(gsm,this));
                 dispose();
             }
         }
