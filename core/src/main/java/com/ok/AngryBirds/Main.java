@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.ok.AngryBirds.States.GameStateManager;
-import com.ok.AngryBirds.States.Level1;
-import com.ok.AngryBirds.States.Level_1;
-import com.ok.AngryBirds.States.MenuState;
+import com.ok.AngryBirds.States.*;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -29,7 +26,7 @@ public class Main extends ApplicationAdapter {
         batch = new SpriteBatch();
         gsm=new GameStateManager();
         Gdx.gl.glClearColor(0,0,0,1);
-        gsm.push(new Level_1(gsm));
+        gsm.push(new MenuState(gsm));
     }
 
     @Override

@@ -11,6 +11,8 @@ public class GameStateManager {
         states = new Stack<State>();
     }
 
+
+
     public void push(State state){
         states.push(state);
     }
