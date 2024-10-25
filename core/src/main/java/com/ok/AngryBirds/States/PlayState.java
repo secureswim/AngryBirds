@@ -2,13 +2,14 @@ package com.ok.AngryBirds.States;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.ok.AngryBirds.Objects.RedBird;
 
 public class PlayState extends State {
     private Texture bird;
 
-    protected PlayState(GameStateManager gsm) {
+    public PlayState(GameStateManager gsm) {
         super(gsm);
-        bird=new Texture("angrybirds_red.png");
+        RedBird bird=new RedBird("angrybirds_red.png");
     }
 
     @Override
