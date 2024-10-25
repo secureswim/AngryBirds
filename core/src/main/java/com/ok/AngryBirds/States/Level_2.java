@@ -10,15 +10,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.ok.AngryBirds.Main;
 
 public class Level_2 extends State {
-    private final Texture level1;
     private final Texture pause;
-    private final Texture construction;
 
     public Level_2(GameStateManager gsm) {
         super(gsm);
-        level1 = new Texture("level1_background.jpg");
         pause = new Texture("pause_button.png");
-        construction=new Texture("workinprogress.png");
+
     }
 
     @Override
@@ -51,9 +48,7 @@ public class Level_2 extends State {
     @Override
     public void render(SpriteBatch sb) {
         sb.begin();
-        sb.draw(level1, 0, 0);
         sb.draw(pause, 30, 650, 85, 85);
-        sb.draw(construction,200,200,500,500);
         sb.end();
     }
 
@@ -62,7 +57,6 @@ public class Level_2 extends State {
 
     @Override
     public void dispose() {
-        level1.dispose();
         pause.dispose();
     }
 

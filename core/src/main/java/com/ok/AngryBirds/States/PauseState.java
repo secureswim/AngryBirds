@@ -41,6 +41,21 @@ public class PauseState extends State{
             if (x >= 30 && x <= 115 && y >= 650 && y <= 735) {
                 gsm.pop();
             }
+
+            if(x >= 40 && x <= 100 && y >=580 && y<=640) {
+                gsm.pop();
+                gsm.pop();
+                gsm.push(new Level_1(gsm));
+            }
+            if(x >= 40 && x <= 100 && y >=510 && y<=570) {
+                gsm.pop();
+                gsm.push(new Level_2(gsm));
+            }
+
+            if(x >= 40 && x <= 100 && y >=440 && y<=500){
+                gsm.pop();
+                gsm.push(new LevelState(gsm));
+            }
         }
     }
 

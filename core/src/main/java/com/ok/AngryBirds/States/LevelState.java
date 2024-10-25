@@ -32,7 +32,7 @@ public class LevelState extends State {
 
             if (touchX >= buttonX && touchX <= buttonX+buttonWidthX &&
                 touchY >= buttonY && touchY <=buttonY+buttonHeightY) {
-                gsm.pop();
+                gsm.push(new MenuState(gsm));
                 dispose();
             }
         }
