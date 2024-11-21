@@ -95,9 +95,6 @@ public class Level_1 extends State {
         sb.end();
     }
 
-
-
-
     @Override
     public void dispose() {
         level1.dispose();

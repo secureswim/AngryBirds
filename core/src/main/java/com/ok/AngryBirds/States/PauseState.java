@@ -12,7 +12,7 @@ public class PauseState extends State{
 
     private final ShapeRenderer shapeRenderer;
     private final State currentState;
-    private final Texture pause_bar;
+    private final Texture pause_bar;    
     private final Texture pause_level;
     private final Texture resume;
     private final Texture replay;
