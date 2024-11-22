@@ -36,9 +36,18 @@ public class Bird {
 
     public void update(float dt) {
         if (is_in_air) {
-            velocityY += gravity * dt;
-            posX += velocityX * dt;
-            posY += velocityY * dt;
+            // Update position using velocity and gravity
+            velocityY += gravity * dt; // Apply gravity to vertical velocity
+            posX += (float) (velocityX * dt);   // Update horizontal position
+            posY += (float) (velocityY * dt+ 0.5*gravity*(dt*dt));   // Update vertical position
+
+            // Stop the bird if it hits the ground
+            if (posY < 0) {
+                posY = 0;
+                is_in_air = false;
+                velocityX = 0;
+                velocityY = 0;
+            }
         }
     }
 

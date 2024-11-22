@@ -125,6 +125,16 @@ public class Level_1 extends State {
     @Override
     public void update(float dt) {
         hande_input();
+
+        // Update bird position if it is launched
+        if (current_bird.isIs_launched()) {
+            current_bird.update(dt);
+
+            // Check if the bird has fallen out of bounds or hit the ground
+            if (current_bird.getPosY() < 0) {
+                current_bird.reset(); // Reset bird position
+            }
+        }
     }
 
 
