@@ -1,13 +1,13 @@
 package com.ok.AngryBirds.States;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.ok.AngryBirds.Main;
+import com.ok.AngryBirds.utils.Trajectory;
+import com.ok.AngryBirds.Sprites.Bird;
+
+import java.util.List;
 
 public class Level_1 extends State {
     private final Texture level1;
@@ -26,6 +26,19 @@ public class Level_1 extends State {
     private final Texture win;
     private final Texture lose;
 
+    private final float slingshot_centreX = 155;
+    private final float slingshot_centreY = 345;
+
+
+    private Bird current_bird;
+    private ShapeRenderer shape_renderer;
+    private List<float[]> trajectory;
+
+    private float startX, startY;
+    private float endX, endY;
+    private boolean is_dragging;
+
+
     public Level_1(GameStateManager gsm) {
         super(gsm);
         level1 = new Texture("level1_background.jpg");
@@ -43,6 +56,9 @@ public class Level_1 extends State {
         pause = new Texture("pause_button.png");
         win = new Texture("win_button.png");
         lose = new Texture("lose_button.png");
+
+        shape_renderer = new ShapeRenderer();
+        current_bird = new Bird(bird);
     }
 
     @Override
@@ -61,6 +77,47 @@ public class Level_1 extends State {
                 } else if (x >= 1110 && x <= 1180 && y >= 595 && y <= 665) {
                     gsm.push(new LoseState(gsm,this));
                 }
+
+                if (!is_dragging) {
+                    startX = x;
+                    startY = y;
+                    is_dragging = true;
+                }
+
+            } else if (Gdx.input.isTouched() && is_dragging) {
+                endX=Gdx.input.getX();
+                endY=Gdx.graphics.getHeight()-Gdx.input.getY();
+
+                float dx= slingshot_centreX -endX;
+                float dy= slingshot_centreY -endY;
+                float angle=(float) Math.toDegrees(Math.atan2(dy, dx));
+                float speed = (float) Math.sqrt(dx * dx + dy * dy) / 3;
+                if (speed < 1) {
+                    speed = 1;
+                }
+
+            trajectory=Trajectory.calculate_trajectory(speed , angle, 0.1f, 10.0f);
+
+                current_bird.setPosX(endX-25);
+                current_bird.setPosY(endY-25);
+            }
+
+
+            else if (!Gdx.input.isTouched() && is_dragging) {
+                float dx = slingshot_centreX - endX;
+                float dy = slingshot_centreY - endY;
+                float speed = (float) Math.sqrt(dx * dx + dy * dy) / 10;
+                float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
+
+                current_bird.setSpeed(speed);
+                current_bird.setAngle(angle);
+                current_bird.launch(speed,angle);
+
+                is_dragging = false;
+                trajectory = null;
+
+                current_bird.setPosX(slingshot_centreX -25);
+                current_bird.setPosY(slingshot_centreY -25);
         }
 
     }
@@ -76,7 +133,7 @@ public class Level_1 extends State {
         sb.begin();
         sb.draw(level1, 0, 0);
         sb.draw(slingshot, 50, 190, 190, 190);
-        sb.draw(bird, 125, 331, 50, 50);
+        sb.draw(bird, current_bird.getPosX(), current_bird.getPosY(), 50, 50);
         sb.draw(bird2,55,193,50,50);
         sb.draw(wood1, 860, 191, 16, 150);
         sb.draw(wood2, 992, 191, 16, 150);
@@ -93,6 +150,25 @@ public class Level_1 extends State {
         sb.draw(lose, 1110, 595, 70, 70);
 
         sb.end();
+
+        if (trajectory != null && is_dragging) {
+            shape_renderer.begin(ShapeRenderer.ShapeType.Line);
+            shape_renderer.setColor(0, 0, 0, 1);
+            for (float[] point : trajectory) {
+                shape_renderer.circle(slingshot_centreX + point[0], slingshot_centreY + point[1], 5);
+            }
+            shape_renderer.end();
+
+            shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
+            shape_renderer.setColor(1, 1, 1, 1);
+
+
+            for (float[] point : trajectory) {
+                shape_renderer.circle(slingshot_centreX + point[0], slingshot_centreY + point[1], 4);
+            }
+            shape_renderer.end();
+        }
+
     }
 
     @Override
