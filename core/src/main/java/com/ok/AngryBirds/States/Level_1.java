@@ -91,7 +91,7 @@ public class Level_1 extends State {
                 float dx= slingshot_centreX -endX;
                 float dy= slingshot_centreY -endY;
                 float angle=(float) Math.toDegrees(Math.atan2(dy, dx));
-                float speed = (float) Math.sqrt(dx * dx + dy * dy) / 3;
+                float speed = (float) Math.sqrt(dx * dx + dy * dy) / 4;
                 if (speed < 1) {
                     speed = 1;
                 }
@@ -106,7 +106,7 @@ public class Level_1 extends State {
             else if (!Gdx.input.isTouched() && is_dragging) {
                 float dx = slingshot_centreX - endX;
                 float dy = slingshot_centreY - endY;
-                float speed = (float) Math.sqrt(dx * dx + dy * dy) / 10;
+                float speed = (float) Math.sqrt(dx * dx + dy * dy) / 4;
                 float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
                 current_bird.setSpeed(speed);
@@ -126,13 +126,11 @@ public class Level_1 extends State {
     public void update(float dt) {
         hande_input();
 
-        // Update bird position if it is launched
         if (current_bird.isIs_launched()) {
             current_bird.update(dt);
 
-            // Check if the bird has fallen out of bounds or hit the ground
-            if (current_bird.getPosY() < 0) {
-                current_bird.reset(); // Reset bird position
+            if (current_bird.getPosY() < 200) {
+                current_bird.reset();
             }
         }
     }
