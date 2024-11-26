@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Trajectory {
-    private static final float GRAVITY = 9.81f;
+    private static final float GRAVITY = 4.905f;
 
     public static List<float[]> calculate_trajectory(float initial_speed, float angle, float time_step, float scale) {
         List<float[]> points = new ArrayList<>();
@@ -31,7 +31,7 @@ public class Trajectory {
             // Stop when trajectory goes below ground
             if (y < 0) break;
 
-            points.add(new float[]{x, y});
+            points.add(new float[]{x, -y});
             t += time_step;
         }
 

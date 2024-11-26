@@ -1,121 +1,157 @@
 package com.ok.AngryBirds.Sprites;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.ok.AngryBirds.utils.Trajectory;
+import com.badlogic.gdx.math.Vector2;
 
 public abstract class Bird {
     private Texture texture;
-    private float posX;
-    private float posY;
     private Body body;
-    private boolean is_launched;
     private World world;
+
+    private float speed;
+    private float angle;
+    private boolean is_launched;
+    private boolean is_in_air;
+
+    private static final float PIXELS_TO_METERS = 100f;
+    private static final float GRAVITY = 9.8f;
+    private Vector2 initialPosition;
 
     public Bird(Texture texture, float x, float y, World world) {
         this.texture = texture;
-        this.posX = x;
-        this.posY = y;
         this.world = world;
-        this.is_launched = false;
+        this.initialPosition = new Vector2(x / PIXELS_TO_METERS, y / PIXELS_TO_METERS);
 
-        // Create static body initially
-        createStaticBody(x, y);
-    }
-
-    private void createStaticBody(float x, float y) {
-        // Remove existing body if it exists
-        if (body != null) {
-            world.destroyBody(body);
-        }
-
-        // Create static body
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(x / 100f, y / 100f);
-
-        body = world.createBody(bodyDef);
-
-        CircleShape shape = new CircleShape();
-        shape.setRadius(0.25f);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.6f;
-
-        body.createFixture(fixtureDef);
-        shape.dispose();
-    }
-
-    private void createDynamicBody(float x, float y) {
-        // Remove existing static body
-        world.destroyBody(body);
-
-        // Create dynamic body
+        // Create body definition
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(x / 100f, y / 100f);
+        bodyDef.position.set(initialPosition);
+        bodyDef.fixedRotation = true; // Prevent rotation
 
+        // Create body in the world
         body = world.createBody(bodyDef);
 
-        CircleShape shape = new CircleShape();
-        shape.setRadius(0.25f);
+        // Create a circular shape for the bird
+        CircleShape circleShape = new CircleShape();
+        circleShape.setRadius(25f / PIXELS_TO_METERS); // Assuming 50x50 pixel bird
 
+        // Create fixture definition
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.6f;
+        fixtureDef.shape = circleShape;
+        fixtureDef.density = 0.5f;
+        fixtureDef.friction = 0.3f;
+        fixtureDef.restitution = 0.2f; // Bounciness
 
+        // Create fixture
         body.createFixture(fixtureDef);
-        shape.dispose();
+
+        // Clean up shape
+        circleShape.dispose();
+
+        // Initially set the body to not move
+        body.setLinearVelocity(0, 0);
+        body.setAwake(false);
+
+        this.is_launched = false;
+        this.is_in_air = false;
     }
 
     public void launch(float speed, float angle) {
-        // First, convert to dynamic body
-        createDynamicBody(posX, posY);
+        // Store initial launch parameters for potential trajectory recreation
+        this.speed = speed;
+        this.angle = angle;
 
-        Vector2 velocity = Trajectory.calculateLaunchVelocity(speed, angle);
+        // Convert angle to radians
+        float radianAngle = (float) Math.toRadians(angle);
 
-        // Apply velocity to the bird
-        body.setLinearVelocity(velocity.x*10, velocity.y*10);
-        is_launched = true;
+        // Calculate initial velocity components
+        float velocityX = speed * (float) Math.cos(radianAngle);
+        float velocityY = speed * (float) Math.sin(radianAngle);
+
+        // Enable body physics
+        body.setAwake(true);
+
+        // Apply impulse to the body with a more physics-accurate approach
+        body.applyLinearImpulse(
+            new Vector2(velocityX, velocityY),
+            body.getWorldCenter(),
+            true
+        );
+
+        this.is_launched = true;
+        this.is_in_air = true;
     }
 
-    public void reset(World world, float x, float y) {
-        // Recreate static body at initial position
-        createStaticBody(x, y);
-        posX = x;
-        posY = y;
+    public void update(float dt) {
+        // Additional trajectory management
+        if (is_launched && is_in_air) {
+            Vector2 currentVelocity = body.getLinearVelocity();
+
+            // Optional: Apply slight drag or air resistance
+            currentVelocity.x *= 0.99f;
+
+            body.setLinearVelocity(currentVelocity);
+        }
+
+        // If the bird falls below ground, reset
+        if (body.getPosition().y * PIXELS_TO_METERS < 200) {
+            reset();
+        }
+    }
+
+    public void reset() {
+        // Reset to initial position
+        body.setTransform(initialPosition, 0);
+        body.setLinearVelocity(0, 0);
+        body.setAwake(false);
+
         is_launched = false;
+        is_in_air = false;
     }
 
-    // Existing getters remain the same
+    // Existing getters and setters remain the same
+    // ... (getPosX, getPosY, getTexture, etc.)
+
+    // Getters and Setters (previous implementation)
     public Texture getTexture() {
         return texture;
     }
 
     public float getPosX() {
-        return posX;
+        return body.getPosition().x * PIXELS_TO_METERS;
+    }
+
+    public void setPosX(float posX) {
+        body.setTransform(posX / PIXELS_TO_METERS, body.getPosition().y, body.getAngle());
     }
 
     public float getPosY() {
-        return posY;
+        return body.getPosition().y * PIXELS_TO_METERS;
     }
 
-    public boolean isIs_launched() {
-        return is_launched;
-    }
-
-    public Vector2 getPosition() {
-        Vector2 position = body.getPosition();
-        return new Vector2(position.x * 10, position.y * 10);
+    public void setPosY(float posY) {
+        body.setTransform(body.getPosition().x, posY / PIXELS_TO_METERS, body.getAngle());
     }
 
     public Body getBody() {
         return body;
     }
+
+    public boolean isIsLaunched() {
+        return is_launched;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public void setAngle(float angle) {
+        this.angle = angle;
+    }
+
+    protected void setIs_launched(boolean is_launched) {
+        this.is_launched = is_launched;
+    }
 }
+

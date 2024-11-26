@@ -21,7 +21,7 @@ public abstract class Obstacle {
         float PIXELS_TO_METERS = 100f;
 
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set((x + width / 2) / PIXELS_TO_METERS, (y + height / 2) / PIXELS_TO_METERS);
 
         PolygonShape shape = new PolygonShape();
