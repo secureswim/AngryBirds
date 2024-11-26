@@ -45,8 +45,20 @@ public class Level_1 extends State {
 
     private void createAllBodies() {
         // Adding obstacles
-        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 860, 191, 16, 150, world));
-        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"), 900, 193, 16, 100, world));
+
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"),860,191,16,150,world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"),992,191,16,150,world));
+        obstacles.add(new WoodObstacle(new Texture("horizontal_wood.png"),855, 333, 155, 16,world));
+        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"),900, 193, 16, 100,world));
+        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"),952, 193, 16, 100,world));
+        obstacles.add(new WoodObstacle(new Texture("horizontal_wood.png"),898, 288, 69, 16,world));
+        obstacles.add(new IceObstacle(new Texture("ice_block.png"),902, 348, 60, 60,world));
+        obstacles.add(new IceObstacle(new Texture("ice_tri_left.png"),860, 348, 42, 42,world));
+        obstacles.add(new IceObstacle(new Texture("ice_tri_right.png"),962, 348, 42, 42,world));
+
+
+//        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 860, 191, 16, 150, world));
+//        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"), 900, 193, 16, 100, world));
 
         // Adding pigs
         pigs.add(new RegularPig(new Texture("pig1.png"), 903, 403, 25, world));
@@ -79,13 +91,26 @@ public class Level_1 extends State {
         }
 
         for (Obstacle obstacle : obstacles) {
-            sb.draw(obstacle.getTexture(), obstacle.getBody().getPosition().x * 100 - 25,
-                obstacle.getBody().getPosition().y * 100 - 25, 50, 50);
+            Texture txt = obstacle.getTexture();
+            sb.draw(
+                txt,
+                obstacle.getBody().getPosition().x * 100 - obstacle.getWidth() / 2,
+                obstacle.getBody().getPosition().y * 100 - obstacle.getHeight() / 2,
+                obstacle.getWidth(),
+                obstacle.getHeight()
+            );
         }
 
         for (Pig pig : pigs) {
-            sb.draw(pig.getTexture(), pig.getBody().getPosition().x * 100 - 25,
-                pig.getBody().getPosition().y * 100 - 25, 50, 50);
+            Texture txt = pig.getTexture();
+            float diameter = pig.getRadius() * 2;
+            sb.draw(
+                txt,
+                pig.getBody().getPosition().x * 100 - pig.getRadius(),
+                pig.getBody().getPosition().y * 100 - pig.getRadius(),
+                diameter,
+                diameter
+            );
         }
         sb.end();
 

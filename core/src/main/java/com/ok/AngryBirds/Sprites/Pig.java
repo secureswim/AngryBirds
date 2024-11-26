@@ -7,10 +7,16 @@ public abstract class Pig {
     private Texture texture;
     private Body body;
     private int health;
+    private float x;
+    private float y;
+    private float radius;
 
     public Pig(Texture texture, float x, float y, float radius, World world) {
         this.texture = texture;
         this.health = getInitialHealth();
+        this.x=x;
+        this.y=y;
+        this.radius=radius;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody; // Pigs can move
@@ -53,6 +59,18 @@ public abstract class Pig {
 
     public boolean isDestroyed() {
         return health <= 0;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }
 
