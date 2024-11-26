@@ -27,7 +27,6 @@ public class Level_1 extends State {
     private final float slingshot_centreX = 155;
     private final float slingshot_centreY = 345;
 
-
     private List<float[]> trajectory;
 
     private float startX, startY;
@@ -47,48 +46,38 @@ public class Level_1 extends State {
         shape_renderer = new ShapeRenderer();
         world = new World(new Vector2(0, -9.81f), true);
 
-
-        birds.add(new RedBird(new Texture("red_ab.png"), 125, 331));
-        birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193));
+        birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
+        birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193, world));
         current_bird = birds.get(0);
         createAllBodies();
     }
 
+
+
     private void createAllBodies() {
+        new Ground(world, 0, 0, 1200 / 100f, 200 / 100f);
 
-        Ground ground=new Ground(world,0,0,1200/100f,200/100f);
-
-//        birds.add(new RedBird(new Texture("red_ab.png"), 125, 331));
-//        birds.add(new YellowBird(new Texture("yellow_ab.png"), 125, 331));
-
-        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"),860,191,16,150,world));
-        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"),992,191,16,150,world));
-        obstacles.add(new WoodObstacle(new Texture("horizontal_wood.png"),855, 333, 155, 16,world));
-        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"),900, 193, 16, 100,world));
-        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"),952, 193, 16, 100,world));
-        obstacles.add(new WoodObstacle(new Texture("horizontal_wood.png"),898, 288, 69, 16,world));
-        obstacles.add(new IceObstacle(new Texture("ice_block.png"),902, 348, 60, 60,world));
-        obstacles.add(new IceObstacle(new Texture("ice_tri_left.png"),860, 348, 42, 42,world));
-        obstacles.add(new IceObstacle(new Texture("ice_tri_right.png"),962, 348, 42, 42,world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 860, 191, 16, 150, world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 992, 191, 16, 150, world));
+        obstacles.add(new WoodObstacle(new Texture("horizontal_wood.png"), 855, 333, 155, 16, world));
+        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"), 900, 193, 16, 100, world));
+        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"), 952, 193, 16, 100, world));
+        obstacles.add(new WoodObstacle(new Texture("horizontal_wood.png"), 898, 288, 69, 16, world));
+        obstacles.add(new IceObstacle(new Texture("ice_block.png"), 902, 348, 60, 60, world));
+        obstacles.add(new IceObstacle(new Texture("ice_tri_left.png"), 860, 348, 42, 42, world));
+        obstacles.add(new IceObstacle(new Texture("ice_tri_right.png"), 962, 348, 42, 42, world));
 
         pigs.add(new RegularPig(new Texture("pig1.png"), 903, 403, 25, world));
     }
-
     @Override
-    protected void hande_input() {
+    protected void handle_input() {
         if (Gdx.input.justTouched()) {
             float x = Gdx.input.getX();
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (x >= 30 && x <= 115 && y >= 650 && y <= 735) {
-                gsm.push(new PauseState(gsm,this));
+                gsm.push(new PauseState(gsm, this));
                 return;
-            }
-            if (x >= 1110 && x <= 1180 && y >= 665 && y <= 735) {
-                gsm.push(new WinState(gsm,this));
-
-            } else if (x >= 1110 && x <= 1180 && y >= 595 && y <= 665) {
-                gsm.push(new LoseState(gsm,this));
             }
 
             if (!is_dragging) {
@@ -96,56 +85,43 @@ public class Level_1 extends State {
                 startY = y;
                 is_dragging = true;
             }
-
         } else if (Gdx.input.isTouched() && is_dragging) {
-            endX=Gdx.input.getX();
-            endY=Gdx.graphics.getHeight()-Gdx.input.getY();
+            endX = Gdx.input.getX();
+            endY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
-            float dx= slingshot_centreX -endX;
-            float dy= slingshot_centreY -endY;
-            float angle=(float) Math.toDegrees(Math.atan2(dy, dx));
+            float dx = slingshot_centreX - endX;
+            float dy = slingshot_centreY - endY;
+            float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
             float speed = (float) Math.sqrt(dx * dx + dy * dy) / 4;
-            if (speed < 1) {
-                speed = 1;
-            }
 
-            trajectory= Trajectory.calculate_trajectory(speed , angle, 0.1f, 10.0f);
-
-            current_bird.setPosX(endX-25);
-            current_bird.setPosY(endY-25);
-        }
-
-
-        else if (!Gdx.input.isTouched() && is_dragging) {
+            trajectory = Trajectory.calculate_trajectory(angle, speed, 0.1f, 10.0f);
+        } else if (!Gdx.input.isTouched() && is_dragging) {
             float dx = slingshot_centreX - endX;
             float dy = slingshot_centreY - endY;
             float speed = (float) Math.sqrt(dx * dx + dy * dy) / 4;
             float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
-            current_bird.setSpeed(speed);
-            current_bird.setAngle(angle);
-            current_bird.launch(speed,angle);
+            current_bird.launch(speed, angle);
 
             is_dragging = false;
             trajectory = null;
-
-            current_bird.reset();
-            current_bird.setPosX(slingshot_centreX -25);
-            current_bird.setPosY(slingshot_centreY -25);
         }
 
     }
-
     @Override
     public void update(float dt) {
-        hande_input();
-        if (current_bird.isIsLaunched()) {
-            current_bird.update(dt);
-            if (current_bird.getPosY() < 200) {
-                current_bird.reset();
+        world.step(1 / 60f, 6, 2); // Step Box2D world
+
+        handle_input();
+
+        if (current_bird.isIs_launched()) {
+            Vector2 position = current_bird.getPosition();
+            if (position.y < 200) {
+                current_bird.reset(world, 125, 331);
             }
         }
     }
+
 
     @Override
     public void render(SpriteBatch sb) {
@@ -154,7 +130,7 @@ public class Level_1 extends State {
         sb.draw(slingshot, 50, 190, 190, 190);
 
         for (Bird bird : birds) {
-            sb.draw(bird.getTexture(), bird.getPosX(), bird.getPosY(), 50, 50);
+            sb.draw(bird.getTexture(), bird.getPosX() - 25, bird.getPosY() - 25, 50, 50);
         }
 
         for (Obstacle obstacle : obstacles) {
@@ -191,14 +167,12 @@ public class Level_1 extends State {
             shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
             shape_renderer.setColor(1, 1, 1, 1);
 
-
             for (float[] point : trajectory) {
-                shape_renderer.circle(slingshot_centreX + point[0], slingshot_centreY + point[1], 4);
+                shape_renderer.circle(slingshot_centreX + point[0], slingshot_centreY + point[1], 5);
             }
             shape_renderer.end();
         }
         sb.end();
-
     }
 
     @Override

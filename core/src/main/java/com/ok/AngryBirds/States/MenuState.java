@@ -15,7 +15,7 @@ public class MenuState extends State{
     }
 
     @Override
-    protected void hande_input() {
+    protected void handle_input() {
         if (Gdx.input.justTouched()) {
             int touchX = Gdx.input.getX();
             int touchY = Gdx.input.getY();
@@ -37,7 +37,7 @@ public class MenuState extends State{
 
     @Override
     public void update(float dt) {
-        hande_input();
+        handle_input();
     }
 
     @Override

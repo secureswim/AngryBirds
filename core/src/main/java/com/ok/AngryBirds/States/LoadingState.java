@@ -23,7 +23,7 @@ public class LoadingState extends State{
     }
 
     @Override
-    protected void hande_input() {
+    protected void handle_input() {
 
     }
 

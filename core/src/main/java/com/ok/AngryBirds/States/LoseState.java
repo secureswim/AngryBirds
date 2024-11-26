@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.Texture;
 
-import com.ok.AngryBirds.Main;
-
 public class LoseState extends State{
 
     private final ShapeRenderer shapeRenderer;
@@ -28,7 +26,7 @@ public class LoseState extends State{
     }
 
     @Override
-    protected void hande_input() {
+    protected void handle_input() {
         if (Gdx.input.justTouched()) {
             float x = Gdx.input.getX();
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
@@ -52,7 +50,7 @@ public class LoseState extends State{
 
     @Override
     public void update(float dt) {
-        hande_input();
+        handle_input();
     }
 
     @Override

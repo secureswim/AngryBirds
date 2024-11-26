@@ -12,7 +12,7 @@ public class PauseState extends State{
 
     private final ShapeRenderer shapeRenderer;
     private final State currentState;
-    private final Texture pause_bar;    
+    private final Texture pause_bar;
     private final Texture pause_level;
     private final Texture resume;
     private final Texture replay;
@@ -33,7 +33,7 @@ public class PauseState extends State{
     }
 
     @Override
-    protected void hande_input() {
+    protected void handle_input() {
         if (Gdx.input.justTouched()) {
             float x = Gdx.input.getX();
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
@@ -62,7 +62,7 @@ public class PauseState extends State{
 
     @Override
     public void update(float dt) {
-        hande_input();
+        handle_input();
     }
 
     @Override

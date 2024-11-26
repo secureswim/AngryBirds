@@ -19,7 +19,7 @@ public class Level_2 extends State {
     }
 
     @Override
-    protected void hande_input() {
+    protected void handle_input() {
         if (Gdx.input.justTouched()) {
             float x = Gdx.input.getX();
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
@@ -41,7 +41,7 @@ public class Level_2 extends State {
 
     @Override
     public void update(float dt) {
-        hande_input();
+        handle_input();
     }
 
 

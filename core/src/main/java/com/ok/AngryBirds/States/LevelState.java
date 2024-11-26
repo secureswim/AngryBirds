@@ -20,7 +20,7 @@ public class LevelState extends State {
     }
 
     @Override
-    protected void hande_input() {
+    protected void handle_input() {
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.input.getY();
@@ -59,7 +59,7 @@ public class LevelState extends State {
 
     @Override
     public void update(float dt) {
-        hande_input();
+        handle_input();
     }
 
     @Override

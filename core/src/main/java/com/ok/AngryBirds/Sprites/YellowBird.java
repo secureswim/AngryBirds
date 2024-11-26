@@ -1,16 +1,11 @@
 package com.ok.AngryBirds.Sprites;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class YellowBird extends Bird {
-    public YellowBird(Texture texture, float x, float y) {
-        super(texture, x, y);
+    public YellowBird(Texture texture, float x, float y, World world) {
+        super(texture, x, y, world);
     }
 
-    @Override
-    public void launch(float speed, float angle) {
-        setSpeed(speed * 1.5f); // Increased speed boost for yellow bird
-        setAngle(angle);
-        setIs_launched(true); // Use the setter or protected variable
-    }
 }

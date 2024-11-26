@@ -13,7 +13,7 @@ public class PlayState extends State {
     }
 
     @Override
-    protected void hande_input() {
+    protected void handle_input() {
     }
 
     @Override
