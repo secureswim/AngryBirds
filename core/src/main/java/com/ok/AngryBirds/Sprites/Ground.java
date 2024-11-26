@@ -1,30 +1,29 @@
 package com.ok.AngryBirds.Sprites;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.*;
 
 public class Ground {
-    public Ground(World world){
-        createGround(world);
-    }
-    private void createGround(World world) {
-        // Define the ground body
-        BodyDef groundBodyDef = new BodyDef();
-        groundBodyDef.position.set(800 / 100f, 50 / 100f); // Centered horizontally, near bottom of the screen
-        groundBodyDef.type = BodyDef.BodyType.StaticBody;
+    private final Body body;
 
-        Body groundBody = world.createBody(groundBodyDef);
+    public Ground(World world, float x, float y, float width, float height) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(x + width / 2, y + height / 2);
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        body = world.createBody(bodyDef);
 
-        // Define the ground shape
-        PolygonShape groundShape = new PolygonShape();
-        groundShape.setAsBox(800 / 100f, 10 / 100f); // Width = screen width, Height = 10 pixels
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width / 2, height / 2);
 
-        // Define the fixture
-        FixtureDef groundFixtureDef = new FixtureDef();
-        groundFixtureDef.shape = groundShape;
-        groundFixtureDef.friction = 0.5f; // Slight friction for bird-land interactions
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.friction = 0.6f;
+        body.createFixture(fixtureDef);
 
-        groundBody.createFixture(groundFixtureDef);
-        groundShape.dispose(); // Dispose of shape after use
+        shape.dispose();
     }
 
+    public Body getBody() {
+        return body;
+    }
 }

@@ -11,6 +11,6 @@ public class YellowBird extends Bird {
     public void launch(float speed, float angle) {
         setSpeed(speed * 1.5f); // Increased speed boost for yellow bird
         setAngle(angle);
-        setLaunched(true); // Use the setter or protected variable
+        setIs_launched(true); // Use the setter or protected variable
     }
 }

@@ -7,10 +7,4 @@ public class RedBird extends Bird {
         super(texture, x, y);
     }
 
-    @Override
-    public void launch(float speed, float angle) {
-        setSpeed(speed);
-        setAngle(angle);
-        setLaunched(true); // Use the setter or protected variable
-    }
 }

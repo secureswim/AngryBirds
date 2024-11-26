@@ -1,13 +1,16 @@
 package com.ok.AngryBirds.States;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ok.AngryBirds.Sprites.*;
+import com.ok.AngryBirds.utils.Trajectory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Level_1 extends State {
     private final Texture levelBackground;
@@ -16,10 +19,20 @@ public class Level_1 extends State {
     private ArrayList<Bird> birds;
     private ArrayList<Obstacle> obstacles;
     private ArrayList<Pig> pigs;
-    private Bird currentBird;
+    private Bird current_bird;
 
     private World world;
-    private ShapeRenderer shapeRenderer;
+    private ShapeRenderer shape_renderer;
+
+    private final float slingshot_centreX = 155;
+    private final float slingshot_centreY = 345;
+
+
+    private List<float[]> trajectory;
+
+    private float startX, startY;
+    private float endX, endY;
+    private boolean is_dragging;
 
     public Level_1(GameStateManager gsm) {
         super(gsm);
@@ -31,21 +44,22 @@ public class Level_1 extends State {
         obstacles = new ArrayList<>();
         pigs = new ArrayList<>();
 
-        shapeRenderer = new ShapeRenderer();
+        shape_renderer = new ShapeRenderer();
         world = new World(new Vector2(0, -9.81f), true);
+
 
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331));
         birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193));
-        currentBird = birds.get(0);
+        current_bird = birds.get(0);
         createAllBodies();
     }
 
     private void createAllBodies() {
 
-        Ground ground=new Ground(world);
+        Ground ground=new Ground(world,0,0,1200/100f,200/100f);
 
-        birds.add(new RedBird(new Texture("red_ab.png"), 125, 331));
-        birds.add(new YellowBird(new Texture("yellow_ab.png"), 125, 331));
+//        birds.add(new RedBird(new Texture("red_ab.png"), 125, 331));
+//        birds.add(new YellowBird(new Texture("yellow_ab.png"), 125, 331));
 
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"),860,191,16,150,world));
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"),992,191,16,150,world));
@@ -62,16 +76,73 @@ public class Level_1 extends State {
 
     @Override
     protected void hande_input() {
+        if (Gdx.input.justTouched()) {
+            float x = Gdx.input.getX();
+            float y = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+            if (x >= 30 && x <= 115 && y >= 650 && y <= 735) {
+                gsm.push(new PauseState(gsm,this));
+                return;
+            }
+            if (x >= 1110 && x <= 1180 && y >= 665 && y <= 735) {
+                gsm.push(new WinState(gsm,this));
+
+            } else if (x >= 1110 && x <= 1180 && y >= 595 && y <= 665) {
+                gsm.push(new LoseState(gsm,this));
+            }
+
+            if (!is_dragging) {
+                startX = x;
+                startY = y;
+                is_dragging = true;
+            }
+
+        } else if (Gdx.input.isTouched() && is_dragging) {
+            endX=Gdx.input.getX();
+            endY=Gdx.graphics.getHeight()-Gdx.input.getY();
+
+            float dx= slingshot_centreX -endX;
+            float dy= slingshot_centreY -endY;
+            float angle=(float) Math.toDegrees(Math.atan2(dy, dx));
+            float speed = (float) Math.sqrt(dx * dx + dy * dy) / 4;
+            if (speed < 1) {
+                speed = 1;
+            }
+
+            trajectory= Trajectory.calculate_trajectory(speed , angle, 0.1f, 10.0f);
+
+            current_bird.setPosX(endX-25);
+            current_bird.setPosY(endY-25);
+        }
+
+
+        else if (!Gdx.input.isTouched() && is_dragging) {
+            float dx = slingshot_centreX - endX;
+            float dy = slingshot_centreY - endY;
+            float speed = (float) Math.sqrt(dx * dx + dy * dy) / 4;
+            float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
+
+            current_bird.setSpeed(speed);
+            current_bird.setAngle(angle);
+            current_bird.launch(speed,angle);
+
+            is_dragging = false;
+            trajectory = null;
+
+            current_bird.reset();
+            current_bird.setPosX(slingshot_centreX -25);
+            current_bird.setPosY(slingshot_centreY -25);
+        }
 
     }
 
     @Override
     public void update(float dt) {
         hande_input();
-        if (currentBird.isIsLaunched()) {
-            currentBird.update(dt);
-            if (currentBird.getPosY() < 200) {
-                currentBird.reset();
+        if (current_bird.isIsLaunched()) {
+            current_bird.update(dt);
+            if (current_bird.getPosY() < 200) {
+                current_bird.reset();
             }
         }
     }
@@ -108,16 +179,33 @@ public class Level_1 extends State {
                 diameter
             );
         }
+
+        if (trajectory != null && is_dragging) {
+            shape_renderer.begin(ShapeRenderer.ShapeType.Line);
+            shape_renderer.setColor(0, 0, 0, 1);
+            for (float[] point : trajectory) {
+                shape_renderer.circle(slingshot_centreX + point[0], slingshot_centreY + point[1], 5);
+            }
+            shape_renderer.end();
+
+            shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
+            shape_renderer.setColor(1, 1, 1, 1);
+
+
+            for (float[] point : trajectory) {
+                shape_renderer.circle(slingshot_centreX + point[0], slingshot_centreY + point[1], 4);
+            }
+            shape_renderer.end();
+        }
         sb.end();
 
-        // Render trajectory (if needed)
     }
 
     @Override
     public void dispose() {
         levelBackground.dispose();
         slingshot.dispose();
-        shapeRenderer.dispose();
+        shape_renderer.dispose();
         world.dispose();
 
         for (Bird bird : birds) bird.getTexture().dispose();
