@@ -2,76 +2,62 @@ package com.ok.AngryBirds.Sprites;
 
 import com.badlogic.gdx.graphics.Texture;
 
-public class Bird {
+public abstract class Bird {
     private Texture texture;
-    private float posX, posY;
+    private float posX;
+    private float posY;
     private float speed;
     private float angle;
-    private float velocityX, velocityY;
-    private boolean is_launched;
-    private boolean is_in_air;
+    protected boolean isLaunched; // Changed access modifier to protected
 
-    private static final float gravity = -9.8f;
-
-    public Bird(Texture texture) {
+    public Bird(Texture texture, float x, float y) {
         this.texture = texture;
-        this.posX = 125;
-        this.posY = 331;
-        this.is_launched = false;
-        this.is_in_air = false;
+        this.posX = x;
+        this.posY = y;
+        this.speed = 0;
+        this.angle = 0;
+        this.isLaunched = false;
     }
 
-    public void launch(float speed,float angle) {
-        this.speed = speed;
-        this.angle = angle;
-
-        float radianAngle = (float) Math.toRadians(angle);
-
-        this.velocityX = (float) (speed * Math.cos(radianAngle));
-        this.velocityY = (float) (speed * Math.sin(radianAngle));
-
-        this.is_launched = true;
-        this.is_in_air = true;
-    }
+    public abstract void launch(float speed, float angle);
 
     public void update(float dt) {
-        if (is_in_air) {
-            velocityY += gravity * dt;
-            posX += (float) (velocityX * dt * 10.0f);
-            posY += (float) (velocityY * dt * 10.0f);
-
-            if (posY < 200) {
-                posY = 200;
-                is_in_air = false;
-                velocityX = 0;
-                velocityY = 0;
-            }
+        if (isLaunched) {
+            float velocityX = (float) (speed * Math.cos(Math.toRadians(angle)));
+            float velocityY = (float) (speed * Math.sin(Math.toRadians(angle)) - 9.81f * dt);
+            posX += velocityX * dt;
+            posY += velocityY * dt;
         }
     }
 
     public void reset() {
-        posX = 125;
-        posY = 331;
-        velocityX = 0;
-        velocityY = 0;
-        is_launched = false;
-        is_in_air = false;
+        isLaunched = false;
+        speed = 0;
+        angle = 0;
+    }
+
+    public Texture getTexture() {
+        return texture;
     }
 
     public float getPosX() {
         return posX;
     }
 
+    public void setPosX(float posX) {
+        this.posX = posX;
+    }
+
     public float getPosY() {
         return posY;
     }
 
-    public boolean isIs_launched() {
-        return is_launched;
+    public void setPosY(float posY) {
+        this.posY = posY;
     }
 
-    public boolean isIs_in_air() {
-        return is_in_air;
+    public boolean isIsLaunched() {
+        return isLaunched;
     }
 
     public void setSpeed(float speed) {
@@ -82,20 +68,7 @@ public class Bird {
         this.angle = angle;
     }
 
-    public void setPosition(float x, float y) {
-        this.posX = x;
-        this.posY = y;
-    }
-
-    public Texture getTexture() {
-        return texture;
-    }
-
-    public void setPosY(float posY) {
-        this.posY = posY;
-    }
-
-    public void setPosX(float posX) {
-        this.posX = posX;
+    protected void setLaunched(boolean launched) {
+        this.isLaunched = launched;
     }
 }
