@@ -34,17 +34,18 @@ public class Level_1 extends State {
         shapeRenderer = new ShapeRenderer();
         world = new World(new Vector2(0, -9.81f), true);
 
-        // Initialize birds
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331));
-        birds.add(new YellowBird(new Texture("yellow_ab.png"), 125, 331));
+        birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193));
         currentBird = birds.get(0);
-
-        // Initialize obstacles and pigs
         createAllBodies();
     }
 
     private void createAllBodies() {
-        // Adding obstacles
+
+        Ground ground=new Ground(world);
+
+        birds.add(new RedBird(new Texture("red_ab.png"), 125, 331));
+        birds.add(new YellowBird(new Texture("yellow_ab.png"), 125, 331));
 
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"),860,191,16,150,world));
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"),992,191,16,150,world));
@@ -56,17 +57,12 @@ public class Level_1 extends State {
         obstacles.add(new IceObstacle(new Texture("ice_tri_left.png"),860, 348, 42, 42,world));
         obstacles.add(new IceObstacle(new Texture("ice_tri_right.png"),962, 348, 42, 42,world));
 
-
-//        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 860, 191, 16, 150, world));
-//        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"), 900, 193, 16, 100, world));
-
-        // Adding pigs
         pigs.add(new RegularPig(new Texture("pig1.png"), 903, 403, 25, world));
     }
 
     @Override
     protected void hande_input() {
-        // Input handling for slingshot and bird launching
+
     }
 
     @Override
