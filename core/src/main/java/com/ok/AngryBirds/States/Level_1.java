@@ -27,6 +27,8 @@ public class Level_1 extends State {
     private final float slingshot_centreX = 155;
     private final float slingshot_centreY = 345;
 
+    private final float PPM=100f;
+
     private List<float[]> trajectory;
 
     private float startX, startY;
@@ -69,21 +71,16 @@ public class Level_1 extends State {
 
         pigs.add(new RegularPig(new Texture("pig1.png"), 903, 403, 25, world));
     }
-    @Override
     protected void handle_input() {
         if (Gdx.input.justTouched()) {
             float x = Gdx.input.getX();
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
 
-            if (x >= 30 && x <= 115 && y >= 650 && y <= 735) {
-                gsm.push(new PauseState(gsm, this));
-                return;
-            }
-
             if (!is_dragging) {
                 startX = x;
                 startY = y;
                 is_dragging = true;
+
             }
         } else if (Gdx.input.isTouched() && is_dragging) {
             endX = Gdx.input.getX();
@@ -92,35 +89,41 @@ public class Level_1 extends State {
             float dx = slingshot_centreX - endX;
             float dy = slingshot_centreY - endY;
             float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
-            float speed = (float) Math.sqrt(dx * dx + dy * dy) / 4;
+            float speed = (float) Math.sqrt(dx * dx + dy * dy) / 2; // Adjust scaling factor
 
-            trajectory = Trajectory.calculate_trajectory(angle, speed, 0.1f, 10.0f);
+            // Calculate trajectory for rendering
+            trajectory = Trajectory.calculate_trajectory(speed, angle, 0.1f, 10.0f);
         } else if (!Gdx.input.isTouched() && is_dragging) {
             float dx = slingshot_centreX - endX;
             float dy = slingshot_centreY - endY;
             float speed = (float) Math.sqrt(dx * dx + dy * dy) / 4;
-            float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
-            current_bird.launch(speed, angle);
+            float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
+            System.out.println("Speed: " + speed);
+            System.out.println("Angle: " + angle);
+            current_bird.launch(speed / PPM, angle); // Convert speed to Box2D world units
 
             is_dragging = false;
             trajectory = null;
         }
-
     }
+
     @Override
     public void update(float dt) {
-        world.step(1 / 60f, 6, 2); // Step Box2D world
+        world.step(1 / 60f, 6, 2); // Step the Box2D world
 
         handle_input();
 
         if (current_bird.isIs_launched()) {
             Vector2 position = current_bird.getPosition();
-            if (position.y < 200) {
-                current_bird.reset(world, 125, 331);
+
+            // Check if bird hits the ground
+            if (position.y < 0) {
+                current_bird.reset(world, 125, 331); // Reset bird to initial position
             }
         }
     }
+
 
 
     @Override
@@ -130,8 +133,16 @@ public class Level_1 extends State {
         sb.draw(slingshot, 50, 190, 190, 190);
 
         for (Bird bird : birds) {
-            sb.draw(bird.getTexture(), bird.getPosX() - 25, bird.getPosY() - 25, 50, 50);
+            Vector2 pos = bird.getPosition();
+            sb.draw(
+                bird.getTexture(),
+                pos.x * PPM - 25,
+                pos.y * PPM - 25,
+                50,
+                50
+            );
         }
+
 
         for (Obstacle obstacle : obstacles) {
             Texture txt = obstacle.getTexture();

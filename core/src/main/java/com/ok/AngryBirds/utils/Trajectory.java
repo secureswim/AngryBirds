@@ -8,21 +8,27 @@ import java.util.List;
 public class Trajectory {
     private static final float GRAVITY = 9.81f;
 
-    public static List<float[]> calculate_trajectory(float speed, float angle, float time_step, float scale) {
+    public static List<float[]> calculate_trajectory(float initial_speed, float angle, float time_step, float scale) {
         List<float[]> points = new ArrayList<>();
 
-        float angle_rad = (float) Math.toRadians(angle);
-        Vector2 initialVelocity = new Vector2(
-            (float) (speed * Math.cos(angle_rad)),
-            (float) (speed * Math.sin(angle_rad))
-        );
+        // Convert angle to radians
+        float radianAngle = (float) Math.toRadians(angle);
+
+        // Initial velocities
+        float vX = (float) (initial_speed * Math.cos(radianAngle));
+        float vY = (float) (initial_speed * Math.sin(radianAngle));
+
         float t = 0;
         while (true) {
-            float x = initialVelocity.x * t;
-            float y = initialVelocity.y * t - 0.5f * GRAVITY * t * t;
+            // Calculate position using projectile motion equations
+            float x = vX * t;
+            float y = vY * t - 0.5f * GRAVITY * t * t;
+
+            // Scale to match screen coordinates
             x *= scale;
             y *= scale;
 
+            // Stop when trajectory goes below ground
             if (y < 0) break;
 
             points.add(new float[]{x, y});
@@ -30,5 +36,15 @@ public class Trajectory {
         }
 
         return points;
+    }
+
+    // New method to calculate exact launch velocity
+    public static Vector2 calculateLaunchVelocity(float speed, float angle) {
+        float radianAngle = (float) Math.toRadians(angle);
+
+        float velocityX = (float) (speed * Math.cos(radianAngle));
+        float velocityY = (float) (speed * Math.sin(radianAngle));
+
+        return new Vector2(velocityX, velocityY);
     }
 }
