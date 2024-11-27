@@ -26,7 +26,7 @@ public class Main extends ApplicationAdapter {
         batch = new SpriteBatch();
         gsm=new GameStateManager();
         Gdx.gl.glClearColor(0,0,0,1);
-        gsm.push(new Level_1(gsm));
+        gsm.push(new LoadingState(gsm));
     }
 
     @Override

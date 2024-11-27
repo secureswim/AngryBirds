@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.Texture;
 
-import com.ok.AngryBirds.Main;
-
-public class WinState extends State{
+public class WinState_1 extends State{
 
     private final ShapeRenderer shapeRenderer;
     private final State currentState;
@@ -16,7 +14,7 @@ public class WinState extends State{
     private final Texture next;
     private final Texture levels;
 
-    protected WinState(GameStateManager gsm, State currentState) {
+    protected WinState_1(GameStateManager gsm, State currentState) {
         super(gsm);
         shapeRenderer=new ShapeRenderer();
         this.currentState = currentState;

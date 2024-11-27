@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ok.AngryBirds.Sprites.*;
 import com.ok.AngryBirds.utils.Trajectory;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Level_2 extends State {
+public class Level_3 extends State {
     private final Texture levelBackground;
     private final Texture slingshot;
     private final Texture pause;
@@ -31,7 +30,6 @@ public class Level_2 extends State {
 
     private World world;
     private ShapeRenderer shape_renderer;
-    private Box2DDebugRenderer debugRenderer;
 
     private static final float PIXELS_TO_METERS = 100f;
     private final float slingshot_centreX = 155;
@@ -44,9 +42,8 @@ public class Level_2 extends State {
     private boolean is_dragging;
 
     private CollisionHandler collisionHandler;
-    private Ground ground;
 
-    public Level_2(GameStateManager gsm) {
+    public Level_3(GameStateManager gsm) {
         super(gsm);
         pause = new Texture("pause_button.png");
         win = new Texture("win_button.png");
@@ -55,18 +52,17 @@ public class Level_2 extends State {
         levelBackground = new Texture("level1_background.jpg");
         slingshot = new Texture("slingshot_ab.png");
 
-        debugRenderer = new Box2DDebugRenderer();  // Initialize debug renderer
-
         birds = new ArrayList<>();
         obstacles = new ArrayList<>();
         pigs = new ArrayList<>();
 
+
         shape_renderer = new ShapeRenderer();
 
         world = new World(new Vector2(0, -4.905f), true);
+
         collisionHandler = new CollisionHandler();
         world.setContactListener(collisionHandler);
-        ground = new Ground(world, 0, 0, 1200/100f, 190/100f);
 
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
         birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193, world));
@@ -76,34 +72,45 @@ public class Level_2 extends State {
     }
 
     private void createAllBodies() {
-        obstacles.add(new SteelObstacle(new Texture("vertical_steel.png"), 810, 191, 16, 150, world));
-        obstacles.add(new SteelObstacle(new Texture("vertical_steel.png"), 910, 191, 16, 150, world));
-        obstacles.add(new SteelObstacle(new Texture("vertical_steel.png"), 1010, 191, 16, 150, world));
-        obstacles.add(new WoodObstacle(new Texture("horizontal_wood.png"), 800, 381, 230, 16, world));
-        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"), 865, 390, 14, 100, world));
-        obstacles.add(new IceObstacle(new Texture("v_ice_short.png"), 965, 390, 14, 100, world));
-        obstacles.add(new IceObstacle(new Texture("h_ice_short.png"), 865, 490, 115, 14, world));
-        obstacles.add(new IceObstacle(new Texture("ice_tri_left.png"), 810, 390, 50, 50, world));
-        obstacles.add(new IceObstacle(new Texture("ice_tri_right.png"), 980, 390, 50, 50, world));
+        Ground ground = new Ground(world, 0, 0, 1200/100f, 190/100f);
 
-        pigs.add(new ArmoredPig(new Texture("armoured_pig.png"), 895, 403, 25, world));
-        pigs.add(new RegularPig(new Texture("regular_pig.png"), 845, 192, 25, world));
-        pigs.add(new RegularPig(new Texture("regular_pig.png"), 945, 192, 25, world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 730, 191, 16, 100, world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 820, 191, 16, 100, world));
+        obstacles.add(new IceObstacle(new Texture("h_ice_short.png"), 730, 291, 100, 14, world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 830, 191, 16, 200, world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 950, 191, 16, 200, world));
+        obstacles.add(new SteelObstacle(new Texture("horizontal_steel.png"), 830, 391, 138, 16, world));
+        obstacles.add(new SteelObstacle(new Texture("vertical_steel.png"), 850, 407, 14, 80, world));
+        obstacles.add(new SteelObstacle(new Texture("vertical_steel.png"), 930, 407, 14, 80, world));
+        obstacles.add(new SteelObstacle(new Texture("horizontal_steel.png"), 850, 487, 90, 14, world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 970, 191, 16, 150, world));
+        obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 1060, 191, 16, 150, world));
+        obstacles.add(new IceObstacle(new Texture("h_ice_short.png"), 975, 341, 100, 14, world));
+
+
+        pigs.add(new ArmoredPig(new Texture("armoured_pig.png"), 870, 403, 27, world));
+        pigs.add(new RegularPig(new Texture("regular_pig.png"), 750, 292, 25, world));
+        pigs.add(new RegularPig(new Texture("regular_pig.png"), 1000, 198, 25, world));
+        pigs.add(new BossPig(new Texture("boss_pig.png"), 860, 198, 35, world));
+
+
     }
 
     private void setupUserData() {
+        // Add user data to birds
         for (Bird bird : birds) {
             bird.getBody().setUserData(bird);
         }
 
+        // Add user data to obstacles
         for (Obstacle obstacle : obstacles) {
             obstacle.getBody().setUserData(obstacle);
         }
 
+        // Add user data to pigs
         for (Pig pig : pigs) {
             pig.getBody().setUserData(pig);
         }
-        ground.getBody().setUserData(ground);
     }
 
     @Override
@@ -113,7 +120,7 @@ public class Level_2 extends State {
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (x >= 30 && x <= 115 && y >= 650 && y <= 735) {
-                gsm.push(new PauseState_2(gsm, this));
+                gsm.push(new PauseState_3(gsm, this));
                 return;
             }
 
@@ -131,9 +138,13 @@ public class Level_2 extends State {
             float dy = slingshot_centreY - endY;
             float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
+            // Adjust speed calculation to prevent extreme velocities
+            //float speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 100, 50);
+
             float new_speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 4, 50);
 
             trajectory = Trajectory.calculate_trajectory(new_speed, angle, 0.1f, 10.0f);
+
 
             // Update bird's body position while dragging
             current_bird.getBody().setTransform(
@@ -147,6 +158,7 @@ public class Level_2 extends State {
             float dx = slingshot_centreX - endX;
             float dy = slingshot_centreY - endY;
 
+            // Adjust speed calculation to prevent extreme velocities
             float speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 100, 50);
             float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
@@ -157,7 +169,6 @@ public class Level_2 extends State {
             trajectory = null;
         }
     }
-
     @Override
     public void update(float dt) {
         // Step the physics world
@@ -209,12 +220,12 @@ public class Level_2 extends State {
                 world.destroyBody(body);
             }
         }
-        // Clear the list after destruction
         bodiesToDestroy.clear();
+
         if (birds.isEmpty() && !pigs.isEmpty()) {
-            gsm.push(new LoseState_2(gsm, this));
+            gsm.push(new LoseState_3(gsm, this));
         } else if (pigs.isEmpty()) {
-            gsm.push(new WinState_2(gsm, this));
+            gsm.push(new WinState_3(gsm, this));
         }
     }
 
@@ -224,8 +235,6 @@ public class Level_2 extends State {
         sb.draw(levelBackground, 0, 0);
         sb.draw(slingshot, 50, 190, 190, 190);
         sb.draw(pause, 30, 650, 85, 85);
-//        sb.draw(win, 1110, 665, 70, 70);
-//        sb.draw(lose, 1110, 595, 70, 70);
 
         for (Bird bird : birds) {
             sb.draw(bird.getTexture(),
@@ -239,6 +248,8 @@ public class Level_2 extends State {
             Texture txt = obstacle.getTexture();
             float bodyX = obstacle.getBody().getPosition().x * PIXELS_TO_METERS;
             float bodyY = obstacle.getBody().getPosition().y * PIXELS_TO_METERS;
+
+            // Use exact height and width offsets
             sb.draw(
                 txt,
                 bodyX - obstacle.getWidth() / 2,
@@ -258,6 +269,7 @@ public class Level_2 extends State {
             );
         }
 
+
         for (Pig pig : pigs) {
             Texture txt = pig.getTexture();
             float diameter = pig.getRadius() * 2;
@@ -274,6 +286,8 @@ public class Level_2 extends State {
             shape_renderer.begin(ShapeRenderer.ShapeType.Line);
             shape_renderer.setColor(0, 0, 0, 1);
             for (float[] point : trajectory) {
+                // Debug print to verify points
+
                 shape_renderer.circle(
                     slingshot_centreX + point[0],
                     slingshot_centreY - point[1],  // Invert Y to match screen coordinates
@@ -296,7 +310,6 @@ public class Level_2 extends State {
         }
 
         sb.end();
-        debugRenderer.render(world, sb.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS, PIXELS_TO_METERS, 1));
     }
 
     @Override
@@ -304,7 +317,6 @@ public class Level_2 extends State {
         levelBackground.dispose();
         slingshot.dispose();
         shape_renderer.dispose();
-        debugRenderer.dispose();
         world.dispose();
         collisionHandler = null;
 

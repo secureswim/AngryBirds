@@ -36,7 +36,7 @@ public abstract class Bird {
         // Create body definition
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(initialPosition);
+        bodyDef.position.set((x+25)/PIXELS_TO_METERS,(y+25)/PIXELS_TO_METERS);
         bodyDef.fixedRotation = true; // Prevent rotation
 
         // Create body in the world

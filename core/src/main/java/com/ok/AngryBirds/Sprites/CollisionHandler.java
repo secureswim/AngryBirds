@@ -29,7 +29,7 @@ public class CollisionHandler implements ContactListener {
 
         boolean is_colliding = false;
 
-        if (collisionVelocity > 0) {
+        if (collisionVelocity > 2.0f) {
             is_colliding = true;
         }
         if(is_colliding) {

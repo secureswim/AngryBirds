@@ -1,7 +1,6 @@
 package com.ok.AngryBirds.States;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -11,12 +10,9 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ok.AngryBirds.Sprites.*;
 import com.ok.AngryBirds.utils.Trajectory;
 
-import java.lang.module.FindException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -120,13 +116,8 @@ public class Level_1 extends State {
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (x >= 30 && x <= 115 && y >= 650 && y <= 735) {
-                gsm.push(new PauseState(gsm, this));
+                gsm.push(new PauseState_1(gsm, this));
                 return;
-            }
-            if (x >= 1110 && x <= 1180 && y >= 665 && y <= 735) {
-                gsm.push(new WinState(gsm, this));
-            } else if (x >= 1110 && x <= 1180 && y >= 595 && y <= 665) {
-                gsm.push(new LoseState(gsm, this));
             }
 
             if (!is_dragging) {
@@ -228,6 +219,40 @@ public class Level_1 extends State {
         }
         // Clear the list after destruction
         bodiesToDestroy.clear();
+
+        if (birds.isEmpty() && !pigs.isEmpty()) {
+            gsm.push(new LoseState_1(gsm, this));
+        } else if (pigs.isEmpty()) {
+            gsm.push(new WinState_1(gsm, this));
+        }
+        // Update each bird
+        Iterator<Bird> birdIterator = birds.iterator();
+        while (birdIterator.hasNext()) {
+            Bird bird = birdIterator.next();
+            bird.update(dt);
+
+            // Check if the bird is the current bird, stationary, and near the ground
+            if (bird == current_bird) {
+                Vector2 position = bird.getBody().getPosition();
+                Vector2 velocity = bird.getBody().getLinearVelocity();
+
+                if (velocity.len() < 0.05f && position.y < 0.5f) { // Adjust y threshold based on ground height
+                    // Destroy bird and move to the next one
+                    bird.getBody().setAwake(false);
+                    world.destroyBody(bird.getBody());
+                    birdIterator.remove();
+
+                    // Move to the next bird if available
+                    if (birds.size() > 0) {
+                        current_bird = birds.get(0);
+                    } else {
+                        current_bird = null;
+                    }
+                }
+            }
+        }
+
+
     }
 
 
@@ -238,13 +263,13 @@ public class Level_1 extends State {
         sb.draw(levelBackground, 0, 0);
         sb.draw(slingshot, 50, 190, 190, 190);
         sb.draw(pause, 30, 650, 85, 85);
-        sb.draw(win, 1110, 665, 70, 70);
-        sb.draw(lose, 1110, 595, 70, 70);
+//        sb.draw(win, 1110, 665, 70, 70);
+//        sb.draw(lose, 1110, 595, 70, 70);
 
         for (Bird bird : birds) {
             sb.draw(bird.getTexture(),
-                bird.getPosX(),
-                bird.getPosY(),
+                bird.getPosX()-25,
+                bird.getPosY()-25,
                 50, 50
             );
         }
