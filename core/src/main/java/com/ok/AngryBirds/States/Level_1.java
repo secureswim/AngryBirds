@@ -4,13 +4,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ok.AngryBirds.Sprites.*;
 import com.ok.AngryBirds.utils.Trajectory;
 
+import java.lang.module.FindException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Level_1 extends State {
     private final Texture levelBackground;
@@ -54,7 +58,6 @@ public class Level_1 extends State {
 
         shape_renderer = new ShapeRenderer();
 
-        // Slightly reduced gravity to slow down fall
         world = new World(new Vector2(0, -4.905f), true);
 
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
@@ -141,6 +144,16 @@ public class Level_1 extends State {
         }
     }
 
+    private boolean shouldDisposeBird(Bird bird) {
+        // Get the bird's velocity
+        float velocityX = bird.getBody().getLinearVelocity().x;
+        float velocityY = bird.getBody().getLinearVelocity().y;
+
+        // Check if velocity is near zero and position is close to the ground
+        boolean isStationary = Math.abs(velocityX) < 0.1f && Math.abs(velocityY) < 0.1f;
+        return isStationary;
+    }
+
     @Override
     public void update(float dt) {
         // Step the physics world
@@ -151,6 +164,29 @@ public class Level_1 extends State {
         // Update each bird
         for (Bird bird : birds) {
             bird.update(dt);
+        }
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle.getBody().getType() == BodyDef.BodyType.DynamicBody) {
+                Vector2 velocity = obstacle.getBody().getLinearVelocity();
+                if (velocity.len() < 0.05f) {
+                    obstacle.getBody().setLinearVelocity(0, 0);
+                    obstacle.getBody().setAngularVelocity(0);
+                }
+            }
+        }
+
+        for (Pig pig : pigs) {
+            if (pig.getBody().getType() == BodyDef.BodyType.DynamicBody) {
+                Vector2 velocity = pig.getBody().getLinearVelocity();
+                if (velocity.len() < 0.05f) {
+                    pig.getBody().setLinearVelocity(0, 0);
+                    pig.getBody().setAngularVelocity(0);
+                }
+            }
+        }
+        if (shouldDisposeBird(current_bird)) {
+            current_bird.getTexture().dispose();           // Dispose the bird's texture and resources
+            world.destroyBody(current_bird.getBody()); // Destroy the Box2D body
         }
     }
 
@@ -174,14 +210,29 @@ public class Level_1 extends State {
 
         for (Obstacle obstacle : obstacles) {
             Texture txt = obstacle.getTexture();
+            float bodyX = obstacle.getBody().getPosition().x * PIXELS_TO_METERS;
+            float bodyY = obstacle.getBody().getPosition().y * PIXELS_TO_METERS;
+
+            // Use exact height and width offsets
             sb.draw(
                 txt,
-                obstacle.getBody().getPosition().x * PIXELS_TO_METERS - obstacle.getWidth() / 2,
-                obstacle.getBody().getPosition().y * PIXELS_TO_METERS - obstacle.getHeight() / 2,
+                bodyX - obstacle.getWidth() / 2,
+                bodyY - obstacle.getHeight() / 2,
+                obstacle.getWidth() / 2,
+                obstacle.getHeight() / 2,
                 obstacle.getWidth(),
-                obstacle.getHeight()
+                obstacle.getHeight(),
+                1f,
+                1f,
+                obstacle.getBody().getAngle() * MathUtils.radiansToDegrees,
+                0, 0,
+                txt.getWidth(),
+                txt.getHeight(),
+                false,
+                false
             );
         }
+
 
         for (Pig pig : pigs) {
             Texture txt = pig.getTexture();

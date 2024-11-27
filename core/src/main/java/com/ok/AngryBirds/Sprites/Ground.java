@@ -17,7 +17,7 @@ public class Ground {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.friction = 0.6f;
+        fixtureDef.friction = 9.9f;
         body.createFixture(fixtureDef);
 
         shape.dispose();
