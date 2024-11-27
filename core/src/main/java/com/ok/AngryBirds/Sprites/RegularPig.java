@@ -10,7 +10,7 @@ public class RegularPig extends Pig {
 
     @Override
     protected int getInitialHealth() {
-        return 100;
+        return 1;
     }
 
     @Override

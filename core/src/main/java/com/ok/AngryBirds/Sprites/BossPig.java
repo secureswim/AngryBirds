@@ -10,7 +10,7 @@ public class BossPig extends Pig {
 
     @Override
     protected int getInitialHealth() {
-        return 500; // Very high health
+        return 1; // Very high health
     }
 
     @Override

@@ -24,6 +24,7 @@ public abstract class Bird {
     }
 
     public int getDamage() {
+        System.out.println("Bird damage: " + damage); // Add this debug line
         return damage;
     }
 

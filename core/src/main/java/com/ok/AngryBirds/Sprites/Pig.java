@@ -55,6 +55,7 @@ public abstract class Pig {
 
     public void reduceHealth(int amount) {
         health = Math.max(0, health - amount);
+        System.out.println("Pig health reduced. Current health: " + health); // Add this debug line
     }
 
     public boolean isDestroyed() {
