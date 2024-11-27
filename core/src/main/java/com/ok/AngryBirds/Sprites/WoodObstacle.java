@@ -4,8 +4,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class WoodObstacle extends Obstacle {
+
     public WoodObstacle(Texture texture, float x, float y, float width, float height, World world) {
         super(texture, x, y, width, height, world);
+        setHealth(1);
     }
 
     @Override

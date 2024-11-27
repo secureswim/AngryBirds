@@ -6,15 +6,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ok.AngryBirds.Sprites.*;
 import com.ok.AngryBirds.utils.Trajectory;
 
-import java.lang.module.FindException;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class Level_1 extends State {
     private final Texture levelBackground;
@@ -59,16 +58,19 @@ public class Level_1 extends State {
         shape_renderer = new ShapeRenderer();
 
         world = new World(new Vector2(0, -4.905f), true);
+        world.setContactListener(collisionHandler);  // Add the collision handler to listen for contact events
 
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
         birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193, world));
         current_bird = birds.get(0);
+
         createAllBodies();
     }
 
     private void createAllBodies() {
         Ground ground = new Ground(world, 0, 0, 1200/100f, 190/100f);
 
+        // Create obstacles and pigs and set their userData
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 860, 191, 16, 150, world));
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 992, 191, 16, 150, world));
         obstacles.add(new WoodObstacle(new Texture("horizontal_wood.png"), 855, 333, 155, 16, world));
@@ -80,6 +82,14 @@ public class Level_1 extends State {
         obstacles.add(new IceObstacle(new Texture("ice_tri_right.png"), 962, 348, 42, 42, world));
 
         pigs.add(new RegularPig(new Texture("pig1.png"), 903, 403, 25, world));
+
+        // Set userData for all obstacles and pigs so they can be detected in the collision handler
+        for (Obstacle obstacle : obstacles) {
+            obstacle.getBody().setUserData(obstacle);  // Set userData to reference the obstacle object itself
+        }
+        for (Pig pig : pigs) {
+            pig.getBody().setUserData(pig);  // Set userData to reference the pig object itself
+        }
     }
 
     @Override
@@ -112,13 +122,9 @@ public class Level_1 extends State {
             float dy = slingshot_centreY - endY;
             float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
-            // Adjust speed calculation to prevent extreme velocities
-            //float speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 100, 50);
-
             float new_speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 4, 50);
 
             trajectory = Trajectory.calculate_trajectory(new_speed, angle, 0.1f, 10.0f);
-
 
             // Update bird's body position while dragging
             current_bird.getBody().setTransform(
@@ -132,7 +138,6 @@ public class Level_1 extends State {
             float dx = slingshot_centreX - endX;
             float dy = slingshot_centreY - endY;
 
-            // Adjust speed calculation to prevent extreme velocities
             float speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 100, 50);
             float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
@@ -144,16 +149,6 @@ public class Level_1 extends State {
         }
     }
 
-    private boolean shouldDisposeBird(Bird bird) {
-        // Get the bird's velocity
-        float velocityX = bird.getBody().getLinearVelocity().x;
-        float velocityY = bird.getBody().getLinearVelocity().y;
-
-        // Check if velocity is near zero and position is close to the ground
-        boolean isStationary = Math.abs(velocityX) < 0.1f && Math.abs(velocityY) < 0.1f;
-        return isStationary;
-    }
-
     @Override
     public void update(float dt) {
         // Step the physics world
@@ -161,33 +156,33 @@ public class Level_1 extends State {
 
         handle_input();
 
+        // Create a list to store bodies that need to be destroyed
+        List<Body> bodiesToRemove = new ArrayList<>();
+
         // Update each bird
         for (Bird bird : birds) {
             bird.update(dt);
         }
-        for (Obstacle obstacle : obstacles) {
-            if (obstacle.getBody().getType() == BodyDef.BodyType.DynamicBody) {
-                Vector2 velocity = obstacle.getBody().getLinearVelocity();
-                if (velocity.len() < 0.05f) {
-                    obstacle.getBody().setLinearVelocity(0, 0);
-                    obstacle.getBody().setAngularVelocity(0);
-                }
+
+        // Check if pigs are destroyed
+        for (Pig pig : pigs) {
+            if (pig.getHealth() <= 0) {
+                bodiesToRemove.add(pig.getBody());
+                pigs.remove(pig);
+                break;
             }
         }
 
-        for (Pig pig : pigs) {
-            if (pig.getBody().getType() == BodyDef.BodyType.DynamicBody) {
-                Vector2 velocity = pig.getBody().getLinearVelocity();
-                if (velocity.len() < 0.05f) {
-                    pig.getBody().setLinearVelocity(0, 0);
-                    pig.getBody().setAngularVelocity(0);
-                }
+        // Check if obstacles are destroyed
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle.getHealth() <= 0) {
+                bodiesToRemove.add(obstacle.getBody());
+                obstacles.remove(obstacle);
+                break;
             }
         }
-        if (shouldDisposeBird(current_bird)) {
-            current_bird.getTexture().dispose();           // Dispose the bird's texture and resources
-            world.destroyBody(current_bird.getBody()); // Destroy the Box2D body
-        }
+
+        // Destroy all the bodies in the list after the physics step
     }
 
 
@@ -213,7 +208,6 @@ public class Level_1 extends State {
             float bodyX = obstacle.getBody().getPosition().x * PIXELS_TO_METERS;
             float bodyY = obstacle.getBody().getPosition().y * PIXELS_TO_METERS;
 
-            // Use exact height and width offsets
             sb.draw(
                 txt,
                 bodyX - obstacle.getWidth() / 2,
@@ -223,16 +217,9 @@ public class Level_1 extends State {
                 obstacle.getWidth(),
                 obstacle.getHeight(),
                 1f,
-                1f,
-                obstacle.getBody().getAngle() * MathUtils.radiansToDegrees,
-                0, 0,
-                txt.getWidth(),
-                txt.getHeight(),
-                false,
-                false
+                1f
             );
         }
-
 
         for (Pig pig : pigs) {
             Texture txt = pig.getTexture();
@@ -250,8 +237,6 @@ public class Level_1 extends State {
             shape_renderer.begin(ShapeRenderer.ShapeType.Line);
             shape_renderer.setColor(0, 0, 0, 1);
             for (float[] point : trajectory) {
-                // Debug print to verify points
-
                 shape_renderer.circle(
                     slingshot_centreX + point[0],
                     slingshot_centreY - point[1],  // Invert Y to match screen coordinates

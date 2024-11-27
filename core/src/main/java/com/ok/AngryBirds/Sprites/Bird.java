@@ -8,6 +8,7 @@ public abstract class Bird {
     private Texture texture;
     private Body body;
     private World world;
+    private int damage;
 
     private float speed;
     private float angle;
@@ -17,6 +18,14 @@ public abstract class Bird {
     private static final float PIXELS_TO_METERS = 100f;
     private static final float GRAVITY = 9.8f;
     private Vector2 initialPosition;
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public int getDamage() {
+        return damage;
+    }
 
     public Bird(Texture texture, float x, float y, World world) {
         this.texture = texture;

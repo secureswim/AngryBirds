@@ -10,6 +10,15 @@ public abstract class Obstacle {
     private float posY;
     private float width;
     private float height;
+    private int health;
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
 
     public Obstacle(Texture texture, float x, float y, float width, float height, World world) {
         this.texture = texture;
@@ -54,6 +63,10 @@ public abstract class Obstacle {
         return height;
     }
 
+    public void reduceHealth(int damage) {
+        health -= damage;
+    }
+
     protected abstract float getDensity();
     protected abstract float getFriction();
     protected abstract float getRestitution();
@@ -64,5 +77,14 @@ public abstract class Obstacle {
 
     public Body getBody() {
         return body;
+    }
+
+    public boolean isDestroyed() {
+        if(health<=0){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }

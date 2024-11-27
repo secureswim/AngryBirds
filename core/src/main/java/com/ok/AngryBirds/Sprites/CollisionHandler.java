@@ -7,10 +7,6 @@ public class CollisionHandler implements ContactListener {
     // Velocity threshold for causing damage (in m/s)
     private static final float DAMAGE_VELOCITY_THRESHOLD = 5.0f;
 
-    // Damage amounts
-    private static final int BIRD_COLLISION_DAMAGE = 1;
-    private static final int FALL_DAMAGE = 2;
-
     @Override
     public void beginContact(Contact contact) {
         Fixture fixtureA = contact.getFixtureA();
@@ -23,22 +19,13 @@ public class CollisionHandler implements ContactListener {
         // Get the collision velocity
         Vector2 velocityA = bodyA.getLinearVelocity();
         Vector2 velocityB = bodyB.getLinearVelocity();
-        float collisionVelocity = Math.max(
-            Math.abs(velocityA.len()),
-            Math.abs(velocityB.len())
-        );
+        float collisionVelocity = Math.abs(velocityA.sub(velocityB).len());
 
-        // Check if collision involves a Bird
+        // Handle different collision scenarios
         if (isBodyABird(bodyA) || isBodyABird(bodyB)) {
             handleBirdCollision(bodyA, bodyB, collisionVelocity);
         }
 
-        // Check if collision involves a Pig
-        if (isBodyAPig(bodyA) || isBodyAPig(bodyB)) {
-            handlePigCollision(bodyA, bodyB, collisionVelocity);
-        }
-
-        // Check if collision involves an Obstacle
         if (isBodyAnObstacle(bodyA) || isBodyAnObstacle(bodyB)) {
             handleObstacleCollision(bodyA, bodyB, collisionVelocity);
         }
@@ -64,62 +51,55 @@ public class CollisionHandler implements ContactListener {
         Body birdBody = isBodyABird(bodyA) ? bodyA : bodyB;
         Body otherBody = birdBody == bodyA ? bodyB : bodyA;
 
-        // Check if bird has enough velocity to cause damage
-        if (collisionVelocity >= DAMAGE_VELOCITY_THRESHOLD) {
-            // If colliding with a Pig
-            if (isBodyAPig(otherBody)) {
-                Pig pig = (Pig) otherBody.getUserData();
-                if (pig != null) {
-                    pig.reduceHealth(BIRD_COLLISION_DAMAGE);
-                }
-            }
-            // If colliding with an Obstacle
-            else if (isBodyAnObstacle(otherBody)) {
-                Obstacle obstacle = (Obstacle) otherBody.getUserData();
-                if (obstacle != null) {
-                    // Potentially implement obstacle damage logic
-                }
-            }
-        }
-    }
+        Bird bird = (Bird) birdBody.getUserData();
 
-    private void handlePigCollision(Body bodyA, Body bodyB, float collisionVelocity) {
-        // Retrieve the pig body
-        Body pigBody = isBodyAPig(bodyA) ? bodyA : bodyB;
-        Body otherBody = pigBody == bodyA ? bodyB : bodyA;
-
-        // Check if pig falls to ground or collides with high velocity
-        if (collisionVelocity >= DAMAGE_VELOCITY_THRESHOLD) {
-            Pig pig = (Pig) pigBody.getUserData();
-            if (pig != null) {
-                // Apply fall damage or collision damage
-                pig.reduceHealth(FALL_DAMAGE);
+        // Check if the bird collided with an obstacle
+        if (isBodyAnObstacle(otherBody)) {
+            Obstacle obstacle = (Obstacle) otherBody.getUserData();
+            if (obstacle != null && bird != null) {
+                obstacle.reduceHealth(bird.getDamage());
+                if (obstacle.isDestroyed()) {
+                    destroyObstacle(obstacle, otherBody);
+                }
             }
         }
     }
 
     private void handleObstacleCollision(Body bodyA, Body bodyB, float collisionVelocity) {
-        // Retrieve the obstacle body
-        Body obstacleBody = isBodyAnObstacle(bodyA) ? bodyA : bodyB;
-        Body otherBody = obstacleBody == bodyA ? bodyB : bodyA;
+        // Retrieve the obstacle bodies
+        Body obstacleBodyA = isBodyAnObstacle(bodyA) ? bodyA : null;
+        Body obstacleBodyB = isBodyAnObstacle(bodyB) ? bodyB : null;
 
-        // Check if obstacle receives significant impact
-        if (collisionVelocity >= DAMAGE_VELOCITY_THRESHOLD) {
-            Obstacle obstacle = (Obstacle) obstacleBody.getUserData();
-            if (obstacle != null) {
-                // Potential damage logic for obstacles
-                // This could involve reducing structural integrity, breaking, etc.
+        if (obstacleBodyA != null && obstacleBodyB != null) {
+            Obstacle obstacleA = (Obstacle) obstacleBodyA.getUserData();
+            Obstacle obstacleB = (Obstacle) obstacleBodyB.getUserData();
+
+            // Both obstacles lose health upon collision
+            if (obstacleA != null) {
+                obstacleA.reduceHealth(1);
+                if (obstacleA.isDestroyed()) {
+                    destroyObstacle(obstacleA, obstacleBodyA);
+                }
+            }
+
+            if (obstacleB != null) {
+                obstacleB.reduceHealth(1);
+                if (obstacleB.isDestroyed()) {
+                    destroyObstacle(obstacleB, obstacleBodyB);
+                }
             }
         }
+    }
+
+    private void destroyObstacle(Obstacle obstacle, Body obstacleBody) {
+        // Dispose the obstacle's resources and remove it from the physics world
+        obstacleBody.getWorld().destroyBody(obstacleBody);
+        System.out.println("Obstacle destroyed: " + obstacle);
     }
 
     // Utility methods to identify body types
     private boolean isBodyABird(Body body) {
         return body.getUserData() instanceof Bird;
-    }
-
-    private boolean isBodyAPig(Body body) {
-        return body.getUserData() instanceof Pig;
     }
 
     private boolean isBodyAnObstacle(Body body) {
