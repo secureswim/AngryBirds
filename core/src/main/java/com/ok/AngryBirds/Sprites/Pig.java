@@ -36,6 +36,10 @@ public abstract class Pig {
         shape.dispose();
     }
 
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
     protected abstract int getInitialHealth();
     protected abstract float getDensity();
     protected abstract float getFriction();

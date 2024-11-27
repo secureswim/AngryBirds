@@ -1,18 +1,24 @@
 package com.ok.AngryBirds.States;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ok.AngryBirds.Sprites.*;
 import com.ok.AngryBirds.utils.Trajectory;
 
 import java.lang.module.FindException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -42,6 +48,7 @@ public class Level_1 extends State {
     private boolean is_dragging;
 
     private CollisionHandler collisionHandler;
+    private Ground ground;
 
     public Level_1(GameStateManager gsm) {
         super(gsm);
@@ -60,9 +67,10 @@ public class Level_1 extends State {
         shape_renderer = new ShapeRenderer();
 
         world = new World(new Vector2(0, -4.905f), true);
-
         collisionHandler = new CollisionHandler();
         world.setContactListener(collisionHandler);
+        ground = new Ground(world, 0, 0, 1200/100f, 190/100f);
+
 
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
         birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193, world));
@@ -72,7 +80,6 @@ public class Level_1 extends State {
     }
 
     private void createAllBodies() {
-        Ground ground = new Ground(world, 0, 0, 1200/100f, 190/100f);
 
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 860, 191, 16, 150, world));
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 992, 191, 16, 150, world));
@@ -87,21 +94,19 @@ public class Level_1 extends State {
         pigs.add(new RegularPig(new Texture("pig1.png"), 903, 403, 25, world));
     }
 
-    private void setupUserData() {
-        // Add user data to birds
+    private void setupUserData(){
         for (Bird bird : birds) {
             bird.getBody().setUserData(bird);
         }
 
-        // Add user data to obstacles
         for (Obstacle obstacle : obstacles) {
             obstacle.getBody().setUserData(obstacle);
         }
 
-        // Add user data to pigs
         for (Pig pig : pigs) {
             pig.getBody().setUserData(pig);
         }
+        ground.getBody().setUserData(ground);
     }
 
     @Override
@@ -177,7 +182,11 @@ public class Level_1 extends State {
         for (Bird bird : birds) {
             bird.update(dt);
         }
-        for (Obstacle obstacle : obstacles) {
+
+        // Safely remove obstacles
+        Iterator<Obstacle> obstacleIterator = obstacles.iterator();
+        while (obstacleIterator.hasNext()) {
+            Obstacle obstacle = obstacleIterator.next();
             if (obstacle.getBody().getType() == BodyDef.BodyType.DynamicBody) {
                 Vector2 velocity = obstacle.getBody().getLinearVelocity();
                 if (velocity.len() < 0.05f) {
@@ -185,9 +194,15 @@ public class Level_1 extends State {
                     obstacle.getBody().setAngularVelocity(0);
                 }
             }
+            if (collisionHandler.getBodiesToDestroy().contains(obstacle.getBody())) {
+                obstacleIterator.remove();
+            }
         }
 
-        for (Pig pig : pigs) {
+        // Safely remove pigs
+        Iterator<Pig> pigIterator = pigs.iterator();
+        while (pigIterator.hasNext()) {
+            Pig pig = pigIterator.next();
             if (pig.getBody().getType() == BodyDef.BodyType.DynamicBody) {
                 Vector2 velocity = pig.getBody().getLinearVelocity();
                 if (velocity.len() < 0.05f) {
@@ -195,8 +210,22 @@ public class Level_1 extends State {
                     pig.getBody().setAngularVelocity(0);
                 }
             }
+            if (collisionHandler.getBodiesToDestroy().contains(pig.getBody())) {
+                pigIterator.remove();
+            }
         }
+
+        // Destroy bodies after iterations are complete
+        List<Body> bodiesToDestroy = collisionHandler.getBodiesToDestroy();
+        for (Body body : bodiesToDestroy) {
+            if (body != null) {
+                world.destroyBody(body);
+            }
+        }
+        // Clear the list after destruction
+        bodiesToDestroy.clear();
     }
+
 
 
     @Override
@@ -220,8 +249,6 @@ public class Level_1 extends State {
             Texture txt = obstacle.getTexture();
             float bodyX = obstacle.getBody().getPosition().x * PIXELS_TO_METERS;
             float bodyY = obstacle.getBody().getPosition().y * PIXELS_TO_METERS;
-
-            // Use exact height and width offsets
             sb.draw(
                 txt,
                 bodyX - obstacle.getWidth() / 2,
@@ -258,8 +285,6 @@ public class Level_1 extends State {
             shape_renderer.begin(ShapeRenderer.ShapeType.Line);
             shape_renderer.setColor(0, 0, 0, 1);
             for (float[] point : trajectory) {
-                // Debug print to verify points
-
                 shape_renderer.circle(
                     slingshot_centreX + point[0],
                     slingshot_centreY - point[1],  // Invert Y to match screen coordinates
@@ -279,9 +304,11 @@ public class Level_1 extends State {
                 );
             }
             shape_renderer.end();
+
         }
 
         sb.end();
+
     }
 
     @Override
