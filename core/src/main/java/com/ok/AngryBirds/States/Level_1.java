@@ -36,8 +36,7 @@ public class Level_1 extends State {
 
     private World world;
     private ShapeRenderer shape_renderer;
-    private Box2DDebugRenderer debugRenderer;  // Declare Box2DDebugRenderer
-
+    private Box2DDebugRenderer debugRenderer;
 
     private static final float PIXELS_TO_METERS = 100f;
     private final float slingshot_centreX = 155;

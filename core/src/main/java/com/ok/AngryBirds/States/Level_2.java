@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ok.AngryBirds.Sprites.*;
@@ -13,6 +14,7 @@ import com.ok.AngryBirds.utils.Trajectory;
 
 import java.lang.module.FindException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -42,6 +44,7 @@ public class Level_2 extends State {
     private boolean is_dragging;
 
     private CollisionHandler collisionHandler;
+    private Ground ground;
 
     public Level_2(GameStateManager gsm) {
         super(gsm);
@@ -180,7 +183,11 @@ public class Level_2 extends State {
         for (Bird bird : birds) {
             bird.update(dt);
         }
-        for (Obstacle obstacle : obstacles) {
+
+        // Safely remove obstacles
+        Iterator<Obstacle> obstacleIterator = obstacles.iterator();
+        while (obstacleIterator.hasNext()) {
+            Obstacle obstacle = obstacleIterator.next();
             if (obstacle.getBody().getType() == BodyDef.BodyType.DynamicBody) {
                 Vector2 velocity = obstacle.getBody().getLinearVelocity();
                 if (velocity.len() < 0.05f) {
@@ -188,9 +195,15 @@ public class Level_2 extends State {
                     obstacle.getBody().setAngularVelocity(0);
                 }
             }
+            if (collisionHandler.getBodiesToDestroy().contains(obstacle.getBody())) {
+                obstacleIterator.remove();
+            }
         }
 
-        for (Pig pig : pigs) {
+        // Safely remove pigs
+        Iterator<Pig> pigIterator = pigs.iterator();
+        while (pigIterator.hasNext()) {
+            Pig pig = pigIterator.next();
             if (pig.getBody().getType() == BodyDef.BodyType.DynamicBody) {
                 Vector2 velocity = pig.getBody().getLinearVelocity();
                 if (velocity.len() < 0.05f) {
@@ -198,7 +211,20 @@ public class Level_2 extends State {
                     pig.getBody().setAngularVelocity(0);
                 }
             }
+            if (collisionHandler.getBodiesToDestroy().contains(pig.getBody())) {
+                pigIterator.remove();
+            }
         }
+
+        // Destroy bodies after iterations are complete
+        List<Body> bodiesToDestroy = collisionHandler.getBodiesToDestroy();
+        for (Body body : bodiesToDestroy) {
+            if (body != null) {
+                world.destroyBody(body);
+            }
+        }
+        // Clear the list after destruction
+        bodiesToDestroy.clear();
     }
 
 
