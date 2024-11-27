@@ -36,6 +36,8 @@ public class Level_1 extends State {
 
     private World world;
     private ShapeRenderer shape_renderer;
+    private Box2DDebugRenderer debugRenderer;  // Declare Box2DDebugRenderer
+
 
     private static final float PIXELS_TO_METERS = 100f;
     private final float slingshot_centreX = 155;
@@ -58,6 +60,9 @@ public class Level_1 extends State {
 
         levelBackground = new Texture("level1_background.jpg");
         slingshot = new Texture("slingshot_ab.png");
+
+        debugRenderer = new Box2DDebugRenderer();  // Initialize debug renderer
+
 
         birds = new ArrayList<>();
         obstacles = new ArrayList<>();
@@ -308,6 +313,8 @@ public class Level_1 extends State {
         }
 
         sb.end();
+        debugRenderer.render(world, sb.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS, PIXELS_TO_METERS, 1));
+
 
     }
 
