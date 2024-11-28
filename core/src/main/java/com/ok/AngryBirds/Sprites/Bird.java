@@ -21,6 +21,8 @@ public abstract class Bird {
     private static final float PIXELS_TO_METERS = 100f;
     private static final float GRAVITY = 9.8f;
     private Vector2 initialPosition;
+    private float destructionTimer;
+
 
 
 
@@ -71,6 +73,7 @@ public abstract class Bird {
         this.is_launched = false;
         this.is_in_air = false;
         this.health=1;
+        destructionTimer = 0f;
     }
 
     public void launch(float speed, float angle) {
@@ -103,21 +106,22 @@ public abstract class Bird {
         // Additional trajectory management
         if (is_launched && is_in_air) {
             Vector2 currentVelocity = body.getLinearVelocity();
-
-            // Optional: Apply slight drag or air resistance
             currentVelocity.x *= 0.99f;
-
             body.setLinearVelocity(currentVelocity);
         }
-
-        // If the bird falls below ground, reset
         if (body.getPosition().y * PIXELS_TO_METERS < 200) {
             reset();
         }
+        if (body.getLinearVelocity().len() < 0.05f) {
+            destructionTimer += dt;
+        }
+        else {
+            destructionTimer = 0;
+        }
+
     }
 
     public void reset() {
-        // Reset to initial position
         body.setTransform(initialPosition, 0);
         body.setLinearVelocity(0, 0);
         body.setAwake(false);
@@ -125,11 +129,6 @@ public abstract class Bird {
         is_launched = false;
         is_in_air = false;
     }
-
-    // Existing getters and setters remain the same
-    // ... (getPosX, getPosY, getTexture, etc.)
-
-    // Getters and Setters (previous implementation)
     public Texture getTexture() {
         return texture;
     }
@@ -148,6 +147,15 @@ public abstract class Bird {
 
     public void setPosY(float posY) {
         body.setTransform(body.getPosition().x, posY / PIXELS_TO_METERS, body.getAngle());
+    }
+
+    public void startDestructionTimer() {
+        this.destructionTimer = 0f;
+    }
+
+    // Method to update and get the destruction timer
+    public float getDestructionTimer() {
+        return destructionTimer;
     }
 
     public Body getBody() {

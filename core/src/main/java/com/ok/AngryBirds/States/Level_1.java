@@ -45,6 +45,7 @@ public class Level_1 extends State {
 
     private CollisionHandler collisionHandler;
     private Ground ground;
+    private boolean isBirdLaunched;
 
     public Level_1(GameStateManager gsm) {
         super(gsm);
@@ -69,6 +70,8 @@ public class Level_1 extends State {
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
         birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193, world));
         current_bird = birds.get(0);
+
+        isBirdLaunched=false;
 
         createAllBodies();
         setupUserData();
@@ -149,6 +152,8 @@ public class Level_1 extends State {
             current_bird.getBody().setAwake(true);
             current_bird.launch(speed, angle);
 
+            isBirdLaunched=true;
+
             is_dragging = false;
             trajectory = null;
         }
@@ -157,12 +162,40 @@ public class Level_1 extends State {
     @Override
     public void update(float dt) {
         world.step(dt, 6, 2);
-
         handle_input();
-
         for (Bird bird : birds) {
             bird.update(dt);
         }
+        for (Iterator<Bird> iterator = birds.iterator(); iterator.hasNext(); ) {
+            Bird bird = iterator.next();
+            bird.update(dt);
+            if (bird == current_bird && isBirdLaunched) {
+                Vector2 velocity = bird.getBody().getLinearVelocity();
+                if (velocity.len() < 0.05f) {
+                    if (bird.getDestructionTimer() == 0) {
+                        bird.startDestructionTimer();
+                    }
+                    if (bird.getDestructionTimer() >= 4.0f) {
+                        bird.getTexture().dispose();
+                        world.destroyBody(bird.getBody());
+                        iterator.remove();
+                        isBirdLaunched = false;
+                        if (!birds.isEmpty()) {
+                            current_bird = birds.get(0);
+                            current_bird.getBody().setTransform(
+                                slingshot_centreX / PIXELS_TO_METERS,
+                                slingshot_centreY / PIXELS_TO_METERS,
+                                0
+                            );
+                            current_bird.getBody().setAwake(false);
+                        } else {
+                            current_bird = null;
+                        }
+                    }
+                }
+            }
+        }
+
 
         Iterator<Obstacle> obstacleIterator = obstacles.iterator();
         while (obstacleIterator.hasNext()) {
@@ -207,29 +240,6 @@ public class Level_1 extends State {
         } else if (pigs.isEmpty()) {
             gsm.push(new WinState_1(gsm, this));
         }
-
-        Iterator<Bird> birdIterator = birds.iterator();
-        while (birdIterator.hasNext()) {
-            Bird bird = birdIterator.next();
-            if (bird == current_bird) {
-                Vector2 position = bird.getBody().getPosition();
-                Vector2 velocity = bird.getBody().getLinearVelocity();
-
-                if (velocity.len() < 0.05f && position.y <= 0) {
-                    bird.getBody().setAwake(false);
-                    bird.getTexture().dispose();
-                    world.destroyBody(bird.getBody());
-                    birdIterator.remove();
-                    if (!birds.isEmpty()) {
-                        current_bird = birds.get(0);
-                    } else {
-                        current_bird = null;
-                    }
-                }
-            }
-        }
-
-
     }
 
 
@@ -245,6 +255,15 @@ public class Level_1 extends State {
             sb.draw(bird.getTexture(),
                 bird.getPosX()-25,
                 bird.getPosY()-25,
+                50, 50
+            );
+        }
+
+        if (current_bird != null) {
+            sb.draw(
+                current_bird.getTexture(),
+                current_bird.getPosX() - 25,
+                current_bird.getPosY() - 25,
                 50, 50
             );
         }

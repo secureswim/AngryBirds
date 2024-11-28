@@ -18,12 +18,18 @@ public class CollisionHandler implements ContactListener {
 
         Vector2 velocityA = bodyA.getLinearVelocity();
         Vector2 velocityB = bodyB.getLinearVelocity();
-        float collisionVelocity = velocityA.sub(velocityB).len(); // len() gives the magnitude
+        float collisionVelocity = velocityA.sub(velocityB).len();
 
 
         if(bodyA.getUserData() instanceof Pig || bodyB.getUserData() instanceof Ground){
             System.out.println("Pig hit the ground");
             System.out.println(collisionVelocity);
+        }
+
+        if (bodyA.getUserData() instanceof Pig && bodyB.getUserData() instanceof Ground) {
+            handlePigAndGroundCollision(bodyA, bodyB, collisionVelocity);
+        } else if (bodyB.getUserData() instanceof Pig && bodyA.getUserData() instanceof Ground) {
+            handlePigAndGroundCollision(bodyB, bodyA, collisionVelocity);
         }
 
 
@@ -106,6 +112,16 @@ public class CollisionHandler implements ContactListener {
                 if (pig.isDestroyed()) {
                     destroyPig(pig, otherBody);
                 }
+            }
+        }
+    }
+
+    private void handlePigAndGroundCollision(Body pigBody, Body groundBody, float collisionVelocity) {
+        Pig pig = (Pig) pigBody.getUserData();
+        if (collisionVelocity > 2.0f) { // Only destroy if the impact velocity is significant
+            pig.setHealth(-1); // Decrease health or destroy directly
+            if (pig.isDestroyed()) {
+                destroyPig(pig, pigBody);
             }
         }
     }

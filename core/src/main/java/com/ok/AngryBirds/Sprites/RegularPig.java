@@ -20,7 +20,7 @@ public class RegularPig extends Pig {
 
     @Override
     protected float getFriction() {
-        return 0.4f;
+        return 100.4f;
     }
 
     @Override
