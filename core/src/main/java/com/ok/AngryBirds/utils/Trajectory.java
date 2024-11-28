@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Trajectory {
     private static final float GRAVITY = 4.905f;
+    private static final float PIXELS_TO_METERS = 100f;
 
     public static List<float[]> calculate_trajectory(float initial_speed, float angle, float time_step, float scale) {
         List<float[]> points = new ArrayList<>();

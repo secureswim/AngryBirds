@@ -21,8 +21,6 @@ public class Level_2 extends State {
     private final Texture levelBackground;
     private final Texture slingshot;
     private final Texture pause;
-    private final Texture win;
-    private final Texture lose;
 
     private ArrayList<Bird> birds;
     private ArrayList<Obstacle> obstacles;
@@ -49,8 +47,6 @@ public class Level_2 extends State {
     public Level_2(GameStateManager gsm) {
         super(gsm);
         pause = new Texture("pause_button.png");
-        win = new Texture("win_button.png");
-        lose = new Texture("lose_button.png");
 
         levelBackground = new Texture("level1_background.jpg");
         slingshot = new Texture("slingshot_ab.png");

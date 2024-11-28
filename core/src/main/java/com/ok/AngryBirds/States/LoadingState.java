@@ -1,5 +1,7 @@
 package com.ok.AngryBirds.States;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Timer;
@@ -13,6 +15,9 @@ public class LoadingState extends State{
     private final float loadingTime;
     private float elapsedTime;
 
+    private Music backgroundMusic;
+
+
     public LoadingState(GameStateManager gsm) {
         super(gsm);
         loading_bg=new Texture("loading_background.png");
@@ -20,17 +25,22 @@ public class LoadingState extends State{
         loading_bar_background=new Texture("loading_bar_background.png");
         loadingTime=3.5f;
         elapsedTime=0f;
+
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("tinga_linga.mp3"));
+        backgroundMusic.setLooping(true);  // Loop the music
+        backgroundMusic.setVolume(0.5f);   // Set the volume (optional)
+        backgroundMusic.play();
+
+
     }
 
     @Override
     protected void handle_input() {
-
     }
 
     @Override
     public void update(float dt) {
         elapsedTime+=dt;
-
         if (elapsedTime >=loadingTime) {
             gsm.pop();
             gsm.push(new MenuState(gsm));
@@ -50,6 +60,9 @@ public class LoadingState extends State{
 
     @Override
     public void dispose() {
+        backgroundMusic.stop();
+        backgroundMusic.dispose();
+
         loading_bg.dispose();
         loading_bar.dispose();
         loading_bar_background.dispose();

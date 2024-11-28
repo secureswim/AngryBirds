@@ -1,6 +1,7 @@
 package com.ok.AngryBirds.States;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -22,8 +23,6 @@ public class Level_1 extends State {
     private final Texture levelBackground;
     private final Texture slingshot;
     private final Texture pause;
-    private final Texture win;
-    private final Texture lose;
 
     private ArrayList<Bird> birds;
     private ArrayList<Obstacle> obstacles;
@@ -50,19 +49,15 @@ public class Level_1 extends State {
     public Level_1(GameStateManager gsm) {
         super(gsm);
         pause = new Texture("pause_button.png");
-        win = new Texture("win_button.png");
-        lose = new Texture("lose_button.png");
 
         levelBackground = new Texture("level1_background.jpg");
         slingshot = new Texture("slingshot_ab.png");
 
-        debugRenderer = new Box2DDebugRenderer();  // Initialize debug renderer
-
+        debugRenderer = new Box2DDebugRenderer();
 
         birds = new ArrayList<>();
         obstacles = new ArrayList<>();
         pigs = new ArrayList<>();
-
 
         shape_renderer = new ShapeRenderer();
 
@@ -71,10 +66,10 @@ public class Level_1 extends State {
         world.setContactListener(collisionHandler);
         ground = new Ground(world, 0, 0, 1200/100f, 190/100f);
 
-
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
         birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193, world));
         current_bird = birds.get(0);
+
         createAllBodies();
         setupUserData();
     }
@@ -134,15 +129,9 @@ public class Level_1 extends State {
             float dy = slingshot_centreY - endY;
             float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
-            // Adjust speed calculation to prevent extreme velocities
-            //float speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 100, 50);
-
             float new_speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 4, 50);
 
             trajectory = Trajectory.calculate_trajectory(new_speed, angle, 0.1f, 10.0f);
-
-
-            // Update bird's body position while dragging
             current_bird.getBody().setTransform(
                 endX / PIXELS_TO_METERS,
                 endY / PIXELS_TO_METERS,
@@ -154,7 +143,6 @@ public class Level_1 extends State {
             float dx = slingshot_centreX - endX;
             float dy = slingshot_centreY - endY;
 
-            // Adjust speed calculation to prevent extreme velocities
             float speed = Math.min((float) Math.sqrt(dx * dx + dy * dy) / 100, 50);
             float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
 
@@ -168,17 +156,14 @@ public class Level_1 extends State {
 
     @Override
     public void update(float dt) {
-        // Step the physics world
         world.step(dt, 6, 2);
 
         handle_input();
 
-        // Update each bird
         for (Bird bird : birds) {
             bird.update(dt);
         }
 
-        // Safely remove obstacles
         Iterator<Obstacle> obstacleIterator = obstacles.iterator();
         while (obstacleIterator.hasNext()) {
             Obstacle obstacle = obstacleIterator.next();
@@ -194,7 +179,6 @@ public class Level_1 extends State {
             }
         }
 
-        // Safely remove pigs
         Iterator<Pig> pigIterator = pigs.iterator();
         while (pigIterator.hasNext()) {
             Pig pig = pigIterator.next();
@@ -210,14 +194,12 @@ public class Level_1 extends State {
             }
         }
 
-        // Destroy bodies after iterations are complete
         List<Body> bodiesToDestroy = collisionHandler.getBodiesToDestroy();
         for (Body body : bodiesToDestroy) {
             if (body != null) {
                 world.destroyBody(body);
             }
         }
-        // Clear the list after destruction
         bodiesToDestroy.clear();
 
         if (birds.isEmpty() && !pigs.isEmpty()) {
@@ -225,25 +207,20 @@ public class Level_1 extends State {
         } else if (pigs.isEmpty()) {
             gsm.push(new WinState_1(gsm, this));
         }
-        // Update each bird
+
         Iterator<Bird> birdIterator = birds.iterator();
         while (birdIterator.hasNext()) {
             Bird bird = birdIterator.next();
-            bird.update(dt);
-
-            // Check if the bird is the current bird, stationary, and near the ground
             if (bird == current_bird) {
                 Vector2 position = bird.getBody().getPosition();
                 Vector2 velocity = bird.getBody().getLinearVelocity();
 
-                if (velocity.len() < 0.05f && position.y < 0.5f) { // Adjust y threshold based on ground height
-                    // Destroy bird and move to the next one
+                if (velocity.len() < 0.05f && position.y <= 0) {
                     bird.getBody().setAwake(false);
+                    bird.getTexture().dispose();
                     world.destroyBody(bird.getBody());
                     birdIterator.remove();
-
-                    // Move to the next bird if available
-                    if (birds.size() > 0) {
+                    if (!birds.isEmpty()) {
                         current_bird = birds.get(0);
                     } else {
                         current_bird = null;
@@ -263,8 +240,6 @@ public class Level_1 extends State {
         sb.draw(levelBackground, 0, 0);
         sb.draw(slingshot, 50, 190, 190, 190);
         sb.draw(pause, 30, 650, 85, 85);
-//        sb.draw(win, 1110, 665, 70, 70);
-//        sb.draw(lose, 1110, 595, 70, 70);
 
         for (Bird bird : birds) {
             sb.draw(bird.getTexture(),
@@ -314,11 +289,7 @@ public class Level_1 extends State {
             shape_renderer.begin(ShapeRenderer.ShapeType.Line);
             shape_renderer.setColor(0, 0, 0, 1);
             for (float[] point : trajectory) {
-                shape_renderer.circle(
-                    slingshot_centreX + point[0],
-                    slingshot_centreY - point[1],  // Invert Y to match screen coordinates
-                    5
-                );
+                shape_renderer.circle(slingshot_centreX + point[0],slingshot_centreY - point[1],5);
             }
             shape_renderer.end();
 
@@ -333,13 +304,9 @@ public class Level_1 extends State {
                 );
             }
             shape_renderer.end();
-
         }
-
         sb.end();
         debugRenderer.render(world, sb.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS, PIXELS_TO_METERS, 1));
-
-
     }
 
     @Override
@@ -349,6 +316,7 @@ public class Level_1 extends State {
         shape_renderer.dispose();
         world.dispose();
         collisionHandler = null;
+
 
         for (Bird bird : birds) bird.getTexture().dispose();
         for (Obstacle obstacle : obstacles) obstacle.getTexture().dispose();

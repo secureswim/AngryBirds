@@ -10,6 +10,7 @@ public abstract class Pig {
     private float x;
     private float y;
     private float radius;
+    private boolean has_collided;
 
     public Pig(Texture texture, float x, float y, float radius, World world) {
         this.texture = texture;
@@ -34,6 +35,7 @@ public abstract class Pig {
         body = world.createBody(bodyDef);
         body.createFixture(fixtureDef);
         shape.dispose();
+        this.has_collided=false;
     }
 
     public void setHealth(int health) {
@@ -76,6 +78,14 @@ public abstract class Pig {
 
     public float getRadius() {
         return radius;
+    }
+
+    public boolean isHas_collided() {
+        return has_collided;
+    }
+
+    public void setHas_collided(boolean has_collided) {
+        this.has_collided = has_collided;
     }
 }
 

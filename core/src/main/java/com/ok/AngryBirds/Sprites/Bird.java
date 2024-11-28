@@ -1,5 +1,6 @@
 package com.ok.AngryBirds.Sprites;
 
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.math.Vector2;
@@ -10,6 +11,8 @@ public abstract class Bird {
     private World world;
     private int damage;
 
+    private int health;
+
     private float speed;
     private float angle;
     private boolean is_launched;
@@ -18,6 +21,8 @@ public abstract class Bird {
     private static final float PIXELS_TO_METERS = 100f;
     private static final float GRAVITY = 9.8f;
     private Vector2 initialPosition;
+
+
 
     public void setDamage(int damage) {
         this.damage = damage;
@@ -65,6 +70,7 @@ public abstract class Bird {
 
         this.is_launched = false;
         this.is_in_air = false;
+        this.health=1;
     }
 
     public void launch(float speed, float angle) {

@@ -102,6 +102,7 @@ public class CollisionHandler implements ContactListener {
             Pig pig = (Pig) otherBody.getUserData();
             if (pig != null && bird != null) {
                 pig.reduceHealth(bird.getDamage());
+                pig.setHas_collided(true);
                 if (pig.isDestroyed()) {
                     destroyPig(pig, otherBody);
                 }
@@ -126,6 +127,7 @@ public class CollisionHandler implements ContactListener {
         }
 
         Pig pig = (Pig) pigBody.getUserData();
+        pig.setHas_collided(true);
 
         if (isBodyAnObstacle(otherBody)) {
             Obstacle obstacle = (Obstacle) otherBody.getUserData();
