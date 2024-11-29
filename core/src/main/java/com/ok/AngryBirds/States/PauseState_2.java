@@ -43,13 +43,11 @@ public class PauseState_2 extends State{
             }
 
             if(x >= 39 && x <= 103 && y >=582 && y<=646) {
-                gsm.pop();
-                gsm.pop();
-                gsm.push(new Level_2(gsm));
+
+                gsm.set(new Level_2(gsm));
             }
             if(x >= 39 && x <= 103 && y >=516 && y<=580) {
-                gsm.pop();
-                gsm.push(new Level_3(gsm));
+                gsm.set(new Level_3(gsm));
             }
 
             if(x >= 39 && x <= 103 && y >=450 && y<=514){

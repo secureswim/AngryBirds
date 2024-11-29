@@ -1,7 +1,6 @@
 package com.ok.AngryBirds.States;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -186,7 +185,7 @@ public class Level_1 extends State {
                 String type;
                 if (bird instanceof RedBird) {
                     type = "RedBird";
-                } else if (bird instanceof BlueBird) {
+                } else if (bird instanceof BlackBird) {
                     type = "BlueBird";
                 } else {
                     type = "YellowBird";
@@ -249,7 +248,7 @@ public class Level_1 extends State {
             String type;
             if (current_bird instanceof RedBird) {
                 type = "RedBird";
-            } else if (current_bird instanceof BlueBird) {
+            } else if (current_bird instanceof BlackBird) {
                 type = "BlueBird";
             } else {
                 type = "YellowBird";
@@ -307,7 +306,7 @@ public class Level_1 extends State {
                 if ("RedBird".equals(birdData.getType())) {
                     bird = new RedBird(texture, posX, posY, world);
                 } else if ("BlueBird".equals(birdData.getType())) {
-                    bird = new BlueBird(texture, posX, posY, world);
+                    bird = new BlackBird(texture, posX, posY, world);
                 } else if ("YellowBird".equals(birdData.getType())) {
                     bird = new YellowBird(texture, posX, posY, world);
                 }
@@ -428,6 +427,12 @@ public class Level_1 extends State {
             if (collisionHandler.getBodiesToDestroy().contains(obstacle.getBody())) {
                 obstacleIterator.remove();
             }
+            Vector2 position = obstacle.getBody().getPosition();
+            if (position.x < 0 || position.x > 1200 || position.y < 0 || position.y > 750) {
+                obstacleIterator.remove();
+                world.destroyBody(obstacle.getBody());
+                obstacle.getTexture().dispose();
+            }
         }
 
         Iterator<Pig> pigIterator = pigs.iterator();
@@ -442,6 +447,12 @@ public class Level_1 extends State {
             }
             if (collisionHandler.getBodiesToDestroy().contains(pig.getBody())) {
                 pigIterator.remove();
+            }
+            Vector2 position = pig.getBody().getPosition();
+            if (position.x < 0 || position.x > 1200 || position.y < 0 || position.y > 750) {
+                pigIterator.remove();
+                world.destroyBody(pig.getBody());
+                pig.getTexture().dispose();
             }
         }
 

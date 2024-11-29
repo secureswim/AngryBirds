@@ -37,8 +37,7 @@ public class WinState_2 extends State{
                 gsm.push(new Level_2(gsm));
             }
             if (x >= 570 && x <= 634 && y >= 200 && y <= 264) {
-                gsm.pop();
-                gsm.push(new Level_3(gsm));
+                gsm.set(new Level_3(gsm));
             }
             if (x >= 670 && x <= 734 && y >= 200 && y <= 264) {
                 gsm.pop();

@@ -32,9 +32,7 @@ public class LoseState_2 extends State{
             float y = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             if (x >= 470 && x <= 534 && y >= 200 && y <= 264) {
-                gsm.pop();
-                gsm.pop();
-                gsm.push(new Level_2(gsm));
+                gsm.set(new Level_2(gsm));
             }
             if (x >= 570 && x <= 634 && y >= 200 && y <= 264) {
                 gsm.pop();

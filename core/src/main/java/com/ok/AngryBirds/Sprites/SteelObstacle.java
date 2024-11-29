@@ -7,7 +7,7 @@ public class SteelObstacle extends Obstacle {
 
     public SteelObstacle(Texture texture, float x, float y, float width, float height, World world) {
         super(texture, x, y, width, height, world);
-        setHealth(60);
+        setHealth(30);
     }
 
     @Override

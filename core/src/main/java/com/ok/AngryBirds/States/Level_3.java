@@ -1,7 +1,6 @@
 package com.ok.AngryBirds.States;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -76,7 +75,9 @@ public class Level_3 extends State {
         ground = new Ground(world, 0, 0, 1200/100f, 190/100f);
 
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
-        birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193, world));
+        birds.add(new BlackBird(new Texture("black_ab.png"), 55, 193, world));
+        birds.add(new BlackBird(new Texture("black_ab.png"),20,193,world));
+
         current_bird = birds.get(0);
 
         isBirdLaunched=false;
@@ -194,7 +195,7 @@ public class Level_3 extends State {
                 String type;
                 if (bird instanceof RedBird) {
                     type = "RedBird";
-                } else if (bird instanceof BlueBird) {
+                } else if (bird instanceof BlackBird) {
                     type = "BlueBird";
                 } else {
                     type = "YellowBird";
@@ -257,7 +258,7 @@ public class Level_3 extends State {
             String type;
             if (current_bird instanceof RedBird) {
                 type = "RedBird";
-            } else if (current_bird instanceof BlueBird) {
+            } else if (current_bird instanceof BlackBird) {
                 type = "BlueBird";
             } else {
                 type = "YellowBird";
@@ -315,7 +316,7 @@ public class Level_3 extends State {
                 if ("RedBird".equals(birdData.getType())) {
                     bird = new RedBird(texture, posX, posY, world);
                 } else if ("BlueBird".equals(birdData.getType())) {
-                    bird = new BlueBird(texture, posX, posY, world);
+                    bird = new BlackBird(texture, posX, posY, world);
                 } else if ("YellowBird".equals(birdData.getType())) {
                     bird = new YellowBird(texture, posX, posY, world);
                 }
