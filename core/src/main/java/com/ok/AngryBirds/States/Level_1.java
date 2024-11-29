@@ -196,7 +196,6 @@ public class Level_1 extends State {
                     body.getLinearVelocity().x, body.getLinearVelocity().y,
                     body.getAngle(), type));
             }
-
             for (Pig pig : pigs) {
                 Body body = pig.getBody();
                 String type;
@@ -288,7 +287,20 @@ public class Level_1 extends State {
             GameStateData gameState = (GameStateData) ois.readObject();
             ois.close();
             fis.close();
+            for (Bird bird : birds) {
+                world.destroyBody(bird.getBody());
+            }
             birds.clear();
+
+            for (Pig pig : pigs) {
+                world.destroyBody(pig.getBody());
+            }
+            pigs.clear();
+
+            for (Obstacle obstacle : obstacles) {
+                world.destroyBody(obstacle.getBody());
+            }
+            obstacles.clear();
 
             for (BirdData birdData : gameState.birds) {
                 Texture texture = new Texture(birdData.getTexturePath());
@@ -365,10 +377,9 @@ public class Level_1 extends State {
             e.printStackTrace();
         }
     }
-
-
     @Override
     public void update(float dt) {
+
         world.step(dt, 6, 2);
         handle_input();
         for (Bird bird : birds) {

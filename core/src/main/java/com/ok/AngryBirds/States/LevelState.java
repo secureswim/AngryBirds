@@ -145,7 +145,7 @@ public class LevelState extends State {
     public void render(SpriteBatch sb) {
         sb.begin();
         sb.draw(levels,0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        sb.draw(play,405,30,200,100);
+        sb.draw(play,505,30,200,100);
         sb.draw(back,50,30,90,90);
         sb.draw(load_game,900,650,250,67);
 
