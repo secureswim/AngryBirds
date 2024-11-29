@@ -26,9 +26,9 @@ public class LoadingState extends State{
         loadingTime=3.5f;
         elapsedTime=0f;
 
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("tinga_linga.mp3"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("theme_song.mp3"));
         backgroundMusic.setLooping(true);  // Loop the music
-        backgroundMusic.setVolume(0.5f);   // Set the volume (optional)
+        backgroundMusic.setVolume(10.5f);   // Set the volume (optional)
         backgroundMusic.play();
 
 
