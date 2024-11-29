@@ -12,6 +12,26 @@ public abstract class Pig {
     private float radius;
     private boolean has_collided;
 
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
+
+    public void setBody(Body body) {
+        this.body = body;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setRadius(float radius) {
+        this.radius = radius;
+    }
+
     public Pig(Texture texture, float x, float y, float radius, World world) {
         this.texture = texture;
         this.health = getInitialHealth();

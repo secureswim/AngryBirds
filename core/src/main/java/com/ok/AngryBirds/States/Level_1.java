@@ -12,8 +12,12 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ok.AngryBirds.Sprites.*;
-import com.ok.AngryBirds.utils.Trajectory;
+import com.ok.AngryBirds.utils.*;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -158,6 +162,197 @@ public class Level_1 extends State {
             trajectory = null;
         }
     }
+
+    public void saveGameState(String filePath) {
+        try {
+            GameStateData gameState = new GameStateData();
+            gameState.birds = new ArrayList<>();
+            gameState.obstacles = new ArrayList<>();
+            gameState.pigs = new ArrayList<>();
+
+            for (Bird bird : birds) {
+                Body body = bird.getBody();
+                String type;
+                if (bird instanceof RedBird) {
+                    type = "RedBird";
+                } else if (bird instanceof BlueBird) {
+                    type = "BlueBird";
+                } else {
+                    type = "YellowBird";
+                }
+                String texturePath = bird.getTexture().toString();
+                gameState.birds.add(new BirdData(texturePath, body.getPosition().x, body.getPosition().y,
+                    body.getLinearVelocity().x, body.getLinearVelocity().y,
+                    body.getAngle(), type));
+            }
+
+            for (Pig pig : pigs) {
+                Body body = pig.getBody();
+                String type;
+                if (pig instanceof RegularPig) {
+                    type = "RegularPig";
+                } else if (pig instanceof ArmoredPig) {
+                    type = "ArmoredPig";
+                } else {
+                    type = "BossPig";
+                }
+                String texturePath = pig.getTexture().toString();
+                gameState.pigs.add(new PigData(
+                    texturePath,
+                    pig.getX(),
+                    pig.getY(),
+                    body.getLinearVelocity().x,
+                    body.getLinearVelocity().y,
+                    body.getAngle(),
+                    pig.getHealth(),
+                    type,
+                    pig.getRadius(),
+                    pig.isHas_collided()
+                ));
+            }
+
+            for (Obstacle obstacle : obstacles) {
+                Body body = obstacle.getBody();
+                String type;
+                if (obstacle instanceof WoodObstacle) {
+                    type = "WoodObstacle";
+                } else if (obstacle instanceof IceObstacle) {
+                    type = "IceObstacle";
+                } else {
+                    type = "SteelObstacle";
+                }
+                String texturePath = obstacle.getTexture().toString();
+                gameState.obstacles.add(new ObstacleData(
+                    texturePath,
+                    obstacle.getPosX(),
+                    obstacle.getPosY(),
+                    body.getLinearVelocity().x,
+                    body.getLinearVelocity().y,
+                    body.getAngle(),
+                    obstacle.getHealth(),
+                    type,
+                    obstacle.getWidth(),
+                    obstacle.getHeight()
+                ));
+            }
+
+            String type;
+            if (current_bird instanceof RedBird) {
+                type = "RedBird";
+            } else if (current_bird instanceof BlueBird) {
+                type = "BlueBird";
+            } else {
+                type = "YellowBird";
+            }
+            gameState.currentBird = new BirdData(
+                current_bird.getTexture().toString(),
+                current_bird.getBody().getPosition().x,
+                current_bird.getBody().getPosition().y,
+                current_bird.getBody().getLinearVelocity().x,
+                current_bird.getBody().getLinearVelocity().y,
+                current_bird.getBody().getAngle(),
+                type
+            );
+
+            gameState.isBirdLaunched = isBirdLaunched;
+            gameState.slingshotCentreX = slingshot_centreX;
+            gameState.slingshotCentreY = slingshot_centreY;
+
+            FileOutputStream fos = new FileOutputStream(filePath);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(gameState);
+            oos.close();
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadGameState(String filePath) {
+        try {
+            FileInputStream fis = new FileInputStream(filePath);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            GameStateData gameState = (GameStateData) ois.readObject();
+            ois.close();
+            fis.close();
+            birds.clear();
+
+            for (BirdData birdData : gameState.birds) {
+                Texture texture = new Texture(birdData.getTexturePath());
+                Bird bird = null;
+                if (birdData.getType().equals("RedBird")) {
+                    bird = new RedBird(texture, birdData.posX, birdData.posY, world);
+                } else if (birdData.getType().equals("BlueBird")) {
+                    bird = new BlueBird(texture, birdData.posX, birdData.posY, world);
+                } else if (birdData.getType().equals("YellowBird")) {
+                    bird = new YellowBird(texture, birdData.posX, birdData.posY, world);
+                }
+
+                if (bird != null) {
+                    bird.getBody().setLinearVelocity(gameState.currentBird.velocityX, gameState.currentBird.velocityY);
+                    bird.getBody().setTransform(gameState.currentBird.posX, gameState.currentBird.posY, gameState.currentBird.angle);
+                    bird.setIs_launched(gameState.isBirdLaunched);
+                    birds.add(bird);
+                }
+            }
+
+            for (PigData pigData : gameState.pigs) {
+                Texture texture = new Texture(pigData.texturePath);
+                Pig pig = null;
+                if (pigData.type.equals("RegularPig")) {
+                    pig = new RegularPig(texture, pigData.posX, pigData.posY, pigData.radius, world);
+                } else if (pigData.type.equals("ArmoredPig")) {
+                    pig = new ArmoredPig(texture, pigData.posX, pigData.posY, pigData.radius, world);
+                } else if (pigData.type.equals("BossPig")) {
+                    pig = new BossPig(texture, pigData.posX, pigData.posY, pigData.radius, world);
+                }
+
+                if (pig != null) {
+                    pig.setHealth(pigData.health);
+                    pig.setHas_collided(pigData.isHasCollided());
+                    pigs.add(pig);
+                }
+            }
+
+            for (ObstacleData obstacleData : gameState.obstacles) {
+                Texture texture = new Texture(obstacleData.texturePath);
+                Obstacle obstacle = null;
+                if (obstacleData.type.equals("WoodObstacle")) {
+                    obstacle = new WoodObstacle(texture, obstacleData.posX, obstacleData.posY,
+                        obstacleData.width, obstacleData.height, world);
+                } else if (obstacleData.type.equals("IceObstacle")) {
+                    obstacle = new IceObstacle(texture, obstacleData.posX, obstacleData.posY,
+                        obstacleData.width, obstacleData.height, world);
+                } else if (obstacleData.type.equals("SteelObstacle")) {
+                    obstacle = new SteelObstacle(texture, obstacleData.posX, obstacleData.posY,
+                        obstacleData.width, obstacleData.height, world);
+                }
+
+                if (obstacle != null) {
+                    obstacle.setHealth(obstacleData.health);
+                    obstacles.add(obstacle);
+                }
+            }
+
+            Texture currentBirdTexture = new Texture(gameState.currentBird.texturePath);
+            if (gameState.currentBird.type.equals("RedBird")) {
+                current_bird = new RedBird(currentBirdTexture, gameState.currentBird.posX, gameState.currentBird.posY, world);
+            } else if (gameState.currentBird.type.equals("BlueBird")) {
+                current_bird = new BlueBird(currentBirdTexture, gameState.currentBird.posX, gameState.currentBird.posY, world);
+            } else if (gameState.currentBird.type.equals("YellowBird")) {
+                current_bird = new YellowBird(currentBirdTexture, gameState.currentBird.posX, gameState.currentBird.posY, world);
+            }
+
+            if (current_bird != null) {
+                current_bird.getBody().setLinearVelocity(gameState.currentBird.velocityX, gameState.currentBird.velocityY);
+                current_bird.getBody().setTransform(gameState.currentBird.posX, gameState.currentBird.posY, gameState.currentBird.angle);
+                current_bird.setIs_launched(gameState.isBirdLaunched);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void update(float dt) {

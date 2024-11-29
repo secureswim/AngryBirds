@@ -23,11 +23,12 @@ public abstract class Bird {
     private Vector2 initialPosition;
     private float destructionTimer;
 
-
-
-
     public void setDamage(int damage) {
         this.damage = damage;
+    }
+
+    public void setTexture(Texture texture) {
+        this.texture = texture;
     }
 
     public int getDamage() {
@@ -174,7 +175,7 @@ public abstract class Bird {
         this.angle = angle;
     }
 
-    protected void setIs_launched(boolean is_launched) {
+    public void setIs_launched(boolean is_launched) {
         this.is_launched = is_launched;
     }
 }

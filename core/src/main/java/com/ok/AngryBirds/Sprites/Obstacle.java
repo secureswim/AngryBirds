@@ -12,6 +12,30 @@ public abstract class Obstacle {
     private float height;
     private int health;
 
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
+
+    public void setBody(Body body) {
+        this.body = body;
+    }
+
+    public void setPosX(float posX) {
+        this.posX = posX;
+    }
+
+    public void setPosY(float posY) {
+        this.posY = posY;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
     public int getHealth() {
         return health;
     }
