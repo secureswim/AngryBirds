@@ -50,6 +50,8 @@ public class Level_3 extends State {
     private CollisionHandler collisionHandler;
     private Ground ground;
     private boolean isBirdLaunched;
+    private final Texture save_game;
+
 
     public Level_3(GameStateManager gsm) {
         super(gsm);
@@ -57,6 +59,8 @@ public class Level_3 extends State {
 
         levelBackground = new Texture("level1_background.jpg");
         slingshot = new Texture("slingshot_ab.png");
+        save_game=new Texture("save_game.png");
+
 
         debugRenderer = new Box2DDebugRenderer();
 
@@ -74,12 +78,14 @@ public class Level_3 extends State {
         birds.add(new RedBird(new Texture("red_ab.png"), 125, 331, world));
         birds.add(new YellowBird(new Texture("yellow_ab.png"), 55, 193, world));
         current_bird = birds.get(0);
+
+        isBirdLaunched=false;
+
         createAllBodies();
         setupUserData();
     }
 
     private void createAllBodies() {
-
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 730, 191, 16, 100, world));
         obstacles.add(new WoodObstacle(new Texture("vertical_wood.png"), 820, 191, 16, 100, world));
         obstacles.add(new IceObstacle(new Texture("h_ice_short.png"), 730, 291, 100, 14, world));
@@ -98,7 +104,6 @@ public class Level_3 extends State {
         pigs.add(new RegularPig(new Texture("regular_pig.png"), 750, 292, 25, world));
         pigs.add(new RegularPig(new Texture("regular_pig.png"), 1000, 198, 25, world));
         pigs.add(new BossPig(new Texture("boss_pig.png"), 860, 198, 35, world));
-
 
 
     }
@@ -128,6 +133,13 @@ public class Level_3 extends State {
                 gsm.push(new PauseState_1(gsm, this));
                 return;
             }
+
+            if (x >= 900 && x <= 1150 && y >= 650 && y <= 717) {
+                this.saveGameState("game_save.ser");
+                gsm.push(new LevelState(gsm));
+                return;
+            }
+
 
             if (!is_dragging) {
                 startX = x;
@@ -170,7 +182,6 @@ public class Level_3 extends State {
         }
     }
 
-
     public void saveGameState(String filePath) {
         try {
             GameStateData gameState = new GameStateData();
@@ -193,7 +204,6 @@ public class Level_3 extends State {
                     body.getLinearVelocity().x, body.getLinearVelocity().y,
                     body.getAngle(), type));
             }
-
             for (Pig pig : pigs) {
                 Body body = pig.getBody();
                 String type;
@@ -265,7 +275,7 @@ public class Level_3 extends State {
             gameState.isBirdLaunched = isBirdLaunched;
             gameState.slingshotCentreX = slingshot_centreX;
             gameState.slingshotCentreY = slingshot_centreY;
-            gameState.setCurrentLevel("Level_3");
+            gameState.setCurrentLevel("Level_1");
 
 
             FileOutputStream fos = new FileOutputStream(filePath);
@@ -285,36 +295,51 @@ public class Level_3 extends State {
             GameStateData gameState = (GameStateData) ois.readObject();
             ois.close();
             fis.close();
-            birds.clear();
 
+            // Clear existing bodies
+            for (Bird bird : birds) world.destroyBody(bird.getBody());
+            for (Pig pig : pigs) world.destroyBody(pig.getBody());
+            for (Obstacle obstacle : obstacles) world.destroyBody(obstacle.getBody());
+
+            birds.clear();
+            pigs.clear();
+            obstacles.clear();
+
+            // Restore birds
             for (BirdData birdData : gameState.birds) {
                 Texture texture = new Texture(birdData.getTexturePath());
                 Bird bird = null;
-                if (birdData.getType().equals("RedBird")) {
-                    bird = new RedBird(texture, birdData.posX, birdData.posY, world);
-                } else if (birdData.getType().equals("BlueBird")) {
-                    bird = new BlueBird(texture, birdData.posX, birdData.posY, world);
-                } else if (birdData.getType().equals("YellowBird")) {
-                    bird = new YellowBird(texture, birdData.posX, birdData.posY, world);
+                float posX = birdData.posX * PIXELS_TO_METERS;
+                float posY = birdData.posY * PIXELS_TO_METERS;
+
+                if ("RedBird".equals(birdData.getType())) {
+                    bird = new RedBird(texture, posX, posY, world);
+                } else if ("BlueBird".equals(birdData.getType())) {
+                    bird = new BlueBird(texture, posX, posY, world);
+                } else if ("YellowBird".equals(birdData.getType())) {
+                    bird = new YellowBird(texture, posX, posY, world);
                 }
 
                 if (bird != null) {
-                    bird.getBody().setLinearVelocity(gameState.currentBird.velocityX, gameState.currentBird.velocityY);
-                    bird.getBody().setTransform(gameState.currentBird.posX, gameState.currentBird.posY, gameState.currentBird.angle);
+                    bird.getBody().setLinearVelocity(birdData.velocityX, birdData.velocityY);
                     bird.setIs_launched(gameState.isBirdLaunched);
                     birds.add(bird);
                 }
             }
 
+            // Restore pigs
             for (PigData pigData : gameState.pigs) {
                 Texture texture = new Texture(pigData.texturePath);
                 Pig pig = null;
-                if (pigData.type.equals("RegularPig")) {
-                    pig = new RegularPig(texture, pigData.posX, pigData.posY, pigData.radius, world);
-                } else if (pigData.type.equals("ArmoredPig")) {
-                    pig = new ArmoredPig(texture, pigData.posX, pigData.posY, pigData.radius, world);
-                } else if (pigData.type.equals("BossPig")) {
-                    pig = new BossPig(texture, pigData.posX, pigData.posY, pigData.radius, world);
+                float posX = pigData.posX;
+                float posY = pigData.posY;
+
+                if ("RegularPig".equals(pigData.type)) {
+                    pig = new RegularPig(texture, posX, posY, pigData.radius, world);
+                } else if ("ArmoredPig".equals(pigData.type)) {
+                    pig = new ArmoredPig(texture, posX, posY, pigData.radius, world);
+                } else if ("BossPig".equals(pigData.type)) {
+                    pig = new BossPig(texture, posX, posY, pigData.radius, world);
                 }
 
                 if (pig != null) {
@@ -324,18 +349,19 @@ public class Level_3 extends State {
                 }
             }
 
+            // Restore obstacles
             for (ObstacleData obstacleData : gameState.obstacles) {
                 Texture texture = new Texture(obstacleData.texturePath);
                 Obstacle obstacle = null;
-                if (obstacleData.type.equals("WoodObstacle")) {
-                    obstacle = new WoodObstacle(texture, obstacleData.posX, obstacleData.posY,
-                        obstacleData.width, obstacleData.height, world);
-                } else if (obstacleData.type.equals("IceObstacle")) {
-                    obstacle = new IceObstacle(texture, obstacleData.posX, obstacleData.posY,
-                        obstacleData.width, obstacleData.height, world);
-                } else if (obstacleData.type.equals("SteelObstacle")) {
-                    obstacle = new SteelObstacle(texture, obstacleData.posX, obstacleData.posY,
-                        obstacleData.width, obstacleData.height, world);
+                float posX = obstacleData.posX;
+                float posY = obstacleData.posY;
+
+                if ("WoodObstacle".equals(obstacleData.type)) {
+                    obstacle = new WoodObstacle(texture, posX, posY, obstacleData.width, obstacleData.height, world);
+                } else if ("IceObstacle".equals(obstacleData.type)) {
+                    obstacle = new IceObstacle(texture, posX, posY, obstacleData.width, obstacleData.height, world);
+                } else if ("SteelObstacle".equals(obstacleData.type)) {
+                    obstacle = new SteelObstacle(texture, posX, posY, obstacleData.width, obstacleData.height, world);
                 }
 
                 if (obstacle != null) {
@@ -344,20 +370,14 @@ public class Level_3 extends State {
                 }
             }
 
-            Texture currentBirdTexture = new Texture(gameState.currentBird.texturePath);
-            if (gameState.currentBird.type.equals("RedBird")) {
-                current_bird = new RedBird(currentBirdTexture, gameState.currentBird.posX, gameState.currentBird.posY, world);
-            } else if (gameState.currentBird.type.equals("BlueBird")) {
-                current_bird = new BlueBird(currentBirdTexture, gameState.currentBird.posX, gameState.currentBird.posY, world);
-            } else if (gameState.currentBird.type.equals("YellowBird")) {
-                current_bird = new YellowBird(currentBirdTexture, gameState.currentBird.posX, gameState.currentBird.posY, world);
+            // Restore current bird
+            if (gameState.currentBird != null && !birds.isEmpty()) {
+                current_bird = birds.get(0);
             }
 
-            if (current_bird != null) {
-                current_bird.getBody().setLinearVelocity(gameState.currentBird.velocityX, gameState.currentBird.velocityY);
-                current_bird.getBody().setTransform(gameState.currentBird.posX, gameState.currentBird.posY, gameState.currentBird.angle);
-                current_bird.setIs_launched(gameState.isBirdLaunched);
-            }
+            isBirdLaunched = gameState.isBirdLaunched;
+            setupUserData();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -366,6 +386,7 @@ public class Level_3 extends State {
 
     @Override
     public void update(float dt) {
+
         world.step(dt, 6, 2);
         handle_input();
         for (Bird bird : birds) {
@@ -455,6 +476,8 @@ public class Level_3 extends State {
         sb.draw(levelBackground, 0, 0);
         sb.draw(slingshot, 50, 190, 190, 190);
         sb.draw(pause, 30, 650, 85, 85);
+        sb.draw(save_game,900,650,250,67);
+
 
         for (Bird bird : birds) {
             sb.draw(bird.getTexture(),
@@ -530,7 +553,7 @@ public class Level_3 extends State {
             shape_renderer.end();
         }
         sb.end();
-        debugRenderer.render(world, sb.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS, PIXELS_TO_METERS, 1));
+//        debugRenderer.render(world, sb.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS, PIXELS_TO_METERS, 1));
     }
 
     @Override
@@ -540,6 +563,7 @@ public class Level_3 extends State {
         shape_renderer.dispose();
         world.dispose();
         collisionHandler = null;
+        save_game.dispose();
 
 
         for (Bird bird : birds) bird.getTexture().dispose();

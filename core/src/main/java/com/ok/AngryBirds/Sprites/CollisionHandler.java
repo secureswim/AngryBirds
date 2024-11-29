@@ -22,7 +22,7 @@ public class CollisionHandler implements ContactListener {
 
 
         if(bodyA.getUserData() instanceof Pig || bodyB.getUserData() instanceof Ground){
-            System.out.println("Pig hit the ground");
+//            System.out.println("Pig hit the ground");
             System.out.println(collisionVelocity);
         }
 
@@ -130,7 +130,7 @@ public class CollisionHandler implements ContactListener {
         Body pigBody = null;
         Body otherBody = null;
 
-        System.out.println("im here");
+//        System.out.println("im here");
 
 
         if(isBodyAPig(bodyA)){
@@ -175,7 +175,7 @@ public class CollisionHandler implements ContactListener {
 
         if(isBodyGround(otherBody)){
             if (pig != null) {
-                System.out.println("im here");
+//                System.out.println("im here");
                 pig.setHealth(-1);
                 destroyPig(pig,pigBody);
             }
@@ -222,13 +222,13 @@ public class CollisionHandler implements ContactListener {
 
     private void destroyObstacle(Obstacle obstacle, Body obstacleBody) {
         bodiesToDestroy.add(obstacleBody);
-        System.out.println("Obstacle destroyed: " + obstacle);
+//        System.out.println("Obstacle destroyed: " + obstacle);
         obstacle.getTexture().dispose();
     }
 
     private void destroyPig(Pig pig, Body pigBody) {
         bodiesToDestroy.add(pigBody);
-        System.out.println("Obstacle destroyed: " + pig);
+//        System.out.println("Obstacle destroyed: " + pig);
         pig.getTexture().dispose();
     }
 
