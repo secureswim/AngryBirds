@@ -1,6 +1,8 @@
 package com.ok.AngryBirds.utils;
 
-public class BirdData {
+import java.io.Serializable;
+
+public class BirdData implements Serializable {
     public float posX;
     public float posY;
     public float velocityX;

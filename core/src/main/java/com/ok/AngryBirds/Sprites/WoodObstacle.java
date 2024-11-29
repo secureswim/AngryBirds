@@ -7,7 +7,7 @@ public class WoodObstacle extends Obstacle {
 
     public WoodObstacle(Texture texture, float x, float y, float width, float height, World world) {
         super(texture, x, y, width, height, world);
-        setHealth(1);
+        setHealth(40);
     }
 
     @Override

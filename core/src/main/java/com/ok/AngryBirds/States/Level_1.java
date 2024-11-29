@@ -50,6 +50,8 @@ public class Level_1 extends State {
     private CollisionHandler collisionHandler;
     private Ground ground;
     private boolean isBirdLaunched;
+    private final Texture save_game;
+
 
     public Level_1(GameStateManager gsm) {
         super(gsm);
@@ -57,6 +59,8 @@ public class Level_1 extends State {
 
         levelBackground = new Texture("level1_background.jpg");
         slingshot = new Texture("slingshot_ab.png");
+        save_game=new Texture("save_game.png");
+
 
         debugRenderer = new Box2DDebugRenderer();
 
@@ -121,6 +125,13 @@ public class Level_1 extends State {
                 gsm.push(new PauseState_1(gsm, this));
                 return;
             }
+
+            if (x >= 900 && x <= 1150 && y >= 650 && y <= 717) {
+                this.saveGameState("game_save.ser");
+                gsm.push(new LevelState(gsm));
+                return;
+            }
+
 
             if (!is_dragging) {
                 startX = x;
@@ -257,6 +268,8 @@ public class Level_1 extends State {
             gameState.isBirdLaunched = isBirdLaunched;
             gameState.slingshotCentreX = slingshot_centreX;
             gameState.slingshotCentreY = slingshot_centreY;
+            gameState.setCurrentLevel("Level_1");
+
 
             FileOutputStream fos = new FileOutputStream(filePath);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -445,6 +458,8 @@ public class Level_1 extends State {
         sb.draw(levelBackground, 0, 0);
         sb.draw(slingshot, 50, 190, 190, 190);
         sb.draw(pause, 30, 650, 85, 85);
+        sb.draw(save_game,900,650,250,67);
+
 
         for (Bird bird : birds) {
             sb.draw(bird.getTexture(),
@@ -530,6 +545,7 @@ public class Level_1 extends State {
         shape_renderer.dispose();
         world.dispose();
         collisionHandler = null;
+        save_game.dispose();
 
 
         for (Bird bird : birds) bird.getTexture().dispose();

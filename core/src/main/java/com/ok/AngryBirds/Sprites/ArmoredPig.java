@@ -10,7 +10,7 @@ public class ArmoredPig extends Pig {
 
     @Override
     protected int getInitialHealth() {
-        return 200; // Higher health due to armor
+        return 70; // Higher health due to armor
     }
 
     @Override

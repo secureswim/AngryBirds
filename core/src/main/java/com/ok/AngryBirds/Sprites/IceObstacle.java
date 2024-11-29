@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.World;
 public class IceObstacle extends Obstacle {
     public IceObstacle(Texture texture, float x, float y, float width, float height, World world) {
         super(texture, x, y, width, height, world);
-        setHealth(2);
+        setHealth(20);
     }
 
     @Override
