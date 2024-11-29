@@ -65,17 +65,14 @@ public class CollisionHandler implements ContactListener {
 
     @Override
     public void endContact(Contact contact) {
-        // Optional: Implement any end-of-contact logic if needed
     }
 
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
-        // Optional: Pre-collision processing
     }
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
-        // Optional: Post-collision processing
     }
 
     private void handleBirdCollision(Body bodyA, Body bodyB) {
@@ -118,7 +115,7 @@ public class CollisionHandler implements ContactListener {
 
     private void handlePigAndGroundCollision(Body pigBody, Body groundBody, float collisionVelocity) {
         Pig pig = (Pig) pigBody.getUserData();
-        if (collisionVelocity > 2.0f) { // Only destroy if the impact velocity is significant
+        if (collisionVelocity > 2.0f) {
             pig.setHealth(-1); // Decrease health or destroy directly
             if (pig.isDestroyed()) {
                 destroyPig(pig, pigBody);
@@ -130,7 +127,7 @@ public class CollisionHandler implements ContactListener {
         Body pigBody = null;
         Body otherBody = null;
 
-//        System.out.println("im here");
+//        System.out.println("here");
 
 
         if(isBodyAPig(bodyA)){
@@ -175,7 +172,7 @@ public class CollisionHandler implements ContactListener {
 
         if(isBodyGround(otherBody)){
             if (pig != null) {
-//                System.out.println("im here");
+//                System.out.println("here");
                 pig.setHealth(-1);
                 destroyPig(pig,pigBody);
             }

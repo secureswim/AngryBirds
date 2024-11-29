@@ -39,10 +39,10 @@ public class PauseMenu extends State {
         sb.begin();
         sb.enableBlending();
 
-        sb.draw(pause_bg, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); // Dark overlay
+        sb.draw(pause_bg, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         sb.draw(pause_bar,32,465,80,264);
         sb.draw(pause_level, ((float) (Main.width) /2)-250,600,500,135);
-        sb.draw(resume, 30, 650, 85, 85); // Position and size can be adjusted
+        sb.draw(resume, 30, 650, 85, 85);
         sb.draw(replay, 39, 582, 64, 64);
         sb.draw(next, 39, 516, 64, 64);
         sb.draw(levels, 39, 450, 64, 64);

@@ -40,7 +40,7 @@ public abstract class Pig {
         this.radius=radius;
 
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody; // Pigs can move
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set((x + radius) / 100f, (y + radius) / 100f);
 
         CircleShape shape = new CircleShape();
@@ -81,7 +81,7 @@ public abstract class Pig {
 
     public void reduceHealth(int amount) {
         health = Math.max(0, health - amount);
-        System.out.println("Pig health reduced. Current health: " + health); // Add this debug line
+//        System.out.println("Pig health reduced. Current health: " + health);
     }
 
     public boolean isDestroyed() {

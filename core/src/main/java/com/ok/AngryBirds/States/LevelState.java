@@ -9,21 +9,18 @@ import com.ok.AngryBirds.utils.GameStateData;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
-
 public class LevelState extends State {
     private final Texture levels;
     private final Texture play;
     private final Texture back;
     private final Texture load_game;
 
-
     protected LevelState(GameStateManager gsm) {
         super(gsm);
-        levels=new Texture("levels_ab.png");
-        play=new Texture("main_play_button.png");
-        back=new Texture("back_button.png");
-        load_game=new Texture("load_game.png");
-
+        levels = new Texture("levels_ab.png");
+        play = new Texture("main_play_button.png");
+        back = new Texture("back_button.png");
+        load_game = new Texture("load_game.png");
     }
 
     @Override
@@ -31,7 +28,6 @@ public class LevelState extends State {
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.input.getY();
-
             touchY = Main.height - touchY;
 
             float backX = 50;
@@ -39,8 +35,8 @@ public class LevelState extends State {
             float backWidthX = 90;
             float backHeightY = 90;
 
-            if (touchX >= backX && touchX <= backX+ backWidthX &&
-                touchY >= backY && touchY <=backY+ backHeightY) {
+            if (touchX >= backX && touchX <= backX + backWidthX &&
+                touchY >= backY && touchY <= backY + backHeightY) {
                 gsm.push(new MenuState(gsm));
                 dispose();
             }
@@ -48,7 +44,6 @@ public class LevelState extends State {
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.input.getY();
-
             touchY = Main.height - touchY;
 
             float playX = 505;
@@ -65,7 +60,6 @@ public class LevelState extends State {
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.input.getY();
-
             touchY = Main.height - touchY;
 
             float playX = 90;
@@ -83,7 +77,6 @@ public class LevelState extends State {
             float touchX = Gdx.input.getX();
             float touchY = Main.height - Gdx.input.getY();
 
-            // Add load game button check
             float loadX = 900;
             float loadY = 650;
             float loadWidthX = 250;
@@ -91,7 +84,6 @@ public class LevelState extends State {
 
             if (touchX >= loadX && touchX <= loadX + loadWidthX &&
                 touchY >= loadY && touchY <= loadY + loadHeightY) {
-                // Load the saved game state
                 loadSavedGame();
                 return;
             }
@@ -100,7 +92,6 @@ public class LevelState extends State {
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.input.getY();
-
             touchY = Main.height - touchY;
 
             float playX = 295;
@@ -118,7 +109,6 @@ public class LevelState extends State {
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.input.getY();
-
             touchY = Main.height - touchY;
 
             float playX = 468;
@@ -132,8 +122,6 @@ public class LevelState extends State {
                 dispose();
             }
         }
-
-
     }
 
     @Override
@@ -144,27 +132,23 @@ public class LevelState extends State {
     @Override
     public void render(SpriteBatch sb) {
         sb.begin();
-        sb.draw(levels,0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        sb.draw(play,505,30,200,100);
-        sb.draw(back,50,30,90,90);
-        sb.draw(load_game,900,650,250,67);
-
-
+        sb.draw(levels, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        sb.draw(play, 505, 30, 200, 100);
+        sb.draw(back, 50, 30, 90, 90);
+        sb.draw(load_game, 900, 650, 250, 67);
         sb.end();
     }
+
     private void loadSavedGame() {
-        // Check for existing save file
         java.io.File saveFile = new java.io.File("game_save.ser");
         if (saveFile.exists()) {
             try {
-                // Read the game state to determine the level
                 FileInputStream fis = new FileInputStream(saveFile);
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 GameStateData gameState = (GameStateData) ois.readObject();
                 ois.close();
                 fis.close();
 
-                // Determine which level to load based on the saved level
                 State loadedLevel = null;
                 switch (gameState.currentLevel) {
                     case "Level_1":
@@ -187,7 +171,6 @@ public class LevelState extends State {
                         return;
                 }
 
-                // Push the loaded level to the game state manager
                 if (loadedLevel != null) {
                     gsm.push(loadedLevel);
                     dispose();
@@ -197,7 +180,6 @@ public class LevelState extends State {
                 System.out.println("Error loading saved game: " + e.getMessage());
             }
         } else {
-            // Optional: Show a message that no saved game exists
             System.out.println("No saved game found.");
         }
     }

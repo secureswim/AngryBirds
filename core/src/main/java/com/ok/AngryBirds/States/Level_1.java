@@ -287,7 +287,6 @@ public class Level_1 extends State {
             ois.close();
             fis.close();
 
-            // Clear existing bodies
             for (Bird bird : birds) world.destroyBody(bird.getBody());
             for (Pig pig : pigs) world.destroyBody(pig.getBody());
             for (Obstacle obstacle : obstacles) world.destroyBody(obstacle.getBody());
@@ -296,7 +295,6 @@ public class Level_1 extends State {
             pigs.clear();
             obstacles.clear();
 
-            // Restore birds
             for (BirdData birdData : gameState.birds) {
                 Texture texture = new Texture(birdData.getTexturePath());
                 Bird bird = null;
@@ -318,7 +316,6 @@ public class Level_1 extends State {
                 }
             }
 
-            // Restore pigs
             for (PigData pigData : gameState.pigs) {
                 Texture texture = new Texture(pigData.texturePath);
                 Pig pig = null;
@@ -340,7 +337,6 @@ public class Level_1 extends State {
                 }
             }
 
-            // Restore obstacles
             for (ObstacleData obstacleData : gameState.obstacles) {
                 Texture texture = new Texture(obstacleData.texturePath);
                 Obstacle obstacle = null;
@@ -361,7 +357,6 @@ public class Level_1 extends State {
                 }
             }
 
-            // Restore current bird
             if (gameState.currentBird != null && !birds.isEmpty()) {
                 current_bird = birds.get(0);
             }

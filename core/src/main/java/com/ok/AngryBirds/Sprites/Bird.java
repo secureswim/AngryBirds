@@ -32,7 +32,7 @@ public abstract class Bird {
     }
 
     public int getDamage() {
-        System.out.println("Bird damage: " + damage); // Add this debug line
+//        System.out.println("Bird damage: " + damage); // Add this debug line
         return damage;
     }
 
@@ -41,33 +41,26 @@ public abstract class Bird {
         this.world = world;
         this.initialPosition = new Vector2(x / PIXELS_TO_METERS, y / PIXELS_TO_METERS);
 
-        // Create body definition
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set((x+25)/PIXELS_TO_METERS,(y+25)/PIXELS_TO_METERS);
         bodyDef.fixedRotation = true; // Prevent rotation
 
-        // Create body in the world
         body = world.createBody(bodyDef);
 
-        // Create a circular shape for the bird
         CircleShape circleShape = new CircleShape();
-        circleShape.setRadius(25f / PIXELS_TO_METERS); // Assuming 50x50 pixel bird
+        circleShape.setRadius(25f / PIXELS_TO_METERS);
 
-        // Create fixture definition
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circleShape;
         fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.3f;
-        fixtureDef.restitution = 0.2f; // Bounciness
+        fixtureDef.restitution = 0.2f;
 
-        // Create fixture
         body.createFixture(fixtureDef);
 
-        // Clean up shape
         circleShape.dispose();
 
-        // Initially set the body to not move
         body.setLinearVelocity(0, 0);
         body.setAwake(false);
 
@@ -78,21 +71,16 @@ public abstract class Bird {
     }
 
     public void launch(float speed, float angle) {
-        // Store initial launch parameters for potential trajectory recreation
         this.speed = speed;
         this.angle = angle;
 
-        // Convert angle to radians
         float radianAngle = (float) Math.toRadians(angle);
 
-        // Calculate initial velocity components
         float velocityX = speed * (float) Math.cos(radianAngle);
         float velocityY = speed * (float) Math.sin(radianAngle);
 
-        // Enable body physics
         body.setAwake(true);
 
-        // Apply impulse to the body with a more physics-accurate approach
         body.applyLinearImpulse(
             new Vector2(velocityX, velocityY),
             body.getWorldCenter(),
@@ -104,7 +92,6 @@ public abstract class Bird {
     }
 
     public void update(float dt) {
-        // Additional trajectory management
         if (is_launched && is_in_air) {
             Vector2 currentVelocity = body.getLinearVelocity();
             currentVelocity.x *= 0.99f;
@@ -154,7 +141,6 @@ public abstract class Bird {
         this.destructionTimer = 0f;
     }
 
-    // Method to update and get the destruction timer
     public float getDestructionTimer() {
         return destructionTimer;
     }
